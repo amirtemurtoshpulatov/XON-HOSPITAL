@@ -6,9 +6,8 @@ services:
     plan: free
     branch: main
     autoDeployTrigger: commit
-    buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm build
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false && SEED_MODE=if-empty pnpm seed:clinic && pnpm build
     startCommand: pnpm start
-    initialDeployHook: pnpm seed:clinic
     healthCheckPath: /ru
     envVars:
       - key: NODE_VERSION
