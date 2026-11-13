@@ -26,7 +26,13 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const databaseURL = process.env.DATABASE_URL || 'file:./xon-hospital.db'
 const databaseAdapter = databaseURL.startsWith('postgres')
-  ? postgresAdapter({ pool: { connectionString: databaseURL } })
+  ? postgresAdapter({
+      pool: { connectionString: databaseURL },
+      // Render's first deploy starts with an empty Postgres database. Schema push
+      // is enabled explicitly for preview deployments and remains disabled by
+      // default for regular production environments.
+      push: process.env.PAYLOAD_DB_PUSH === 'true',
+    })
   : sqliteAdapter({ client: { url: databaseURL } })
 
 export default buildConfig({
