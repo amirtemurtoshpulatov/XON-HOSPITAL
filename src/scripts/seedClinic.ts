@@ -196,6 +196,18 @@ const serviceDetails: Record<string, {
 async function main() {
   const payload = await getPayload({ config: configPromise })
 
+  if (process.env.SEED_MODE === 'if-empty') {
+    const [doctorCount, serviceCount] = await Promise.all([
+      payload.count({ collection: 'doctors' }),
+      payload.count({ collection: 'services' }),
+    ])
+
+    if (doctorCount.totalDocs > 0 && serviceCount.totalDocs > 0) {
+      payload.logger.info('Clinic seed skipped: database already contains clinic content')
+      return
+    }
+  }
+
   for (const doctor of doctors) {
     const existing = await payload.find({ collection: 'doctors', where: { slug: { equals: doctor.slug } }, limit: 1 })
     const legacy = !existing.docs[0] && doctor.slug === 'vohid-latipov'
