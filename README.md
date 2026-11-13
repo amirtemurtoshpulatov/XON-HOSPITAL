@@ -4,6 +4,8 @@
 
 Разработка сайта: [PLOV AGENCY](https://plovagency.uz/)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/amirtemurtoshpulatov/XON-HOSPITAL)
+
 ## Возможности
 
 - пять языков: русский, узбекский, английский, казахский и таджикский;
@@ -44,7 +46,7 @@ pnpm build
 pnpm start
 ```
 
-Для публичной версии нужен Node.js-хостинг и PostgreSQL. GitHub Pages не подходит, так как CMS и заявки работают на сервере.
+Для публичной версии нужен Node.js-хостинг и PostgreSQL. GitHub Pages не подходит, так как CMS и заявки работают на сервере. Файл `render.yaml` поднимает демо-версию и базу одной кнопкой.
 
 ## Документация
 
