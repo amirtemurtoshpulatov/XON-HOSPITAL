@@ -1,0 +1,26 @@
+build
+dist
+node_modules
+.DS_Store
+.env
+.next
+next-env.d.ts
+.vercel
+xon-hospital.db
+xon-hospital.db-*
+*.sqlite
+*.sqlite3
+
+# Payload default media upload directory
+public/media/
+
+public/robots.txt
+public/sitemap*.xml
+
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
