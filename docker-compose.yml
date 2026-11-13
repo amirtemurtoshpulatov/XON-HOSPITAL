@@ -1,0 +1,36 @@
+services:
+  web:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - media:/app/public/media
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://xon:xon_local_only@database:5432/xon_hospital
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    restart: unless-stopped
+
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: xon_hospital
+      POSTGRES_USER: xon
+      POSTGRES_PASSWORD: xon_local_only
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U xon -d xon_hospital']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  media:
