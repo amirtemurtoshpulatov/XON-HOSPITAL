@@ -21,20 +21,26 @@ export function LeadForm({ locale, labels, defaultService }: Props) {
     const form = event.currentTarget
     const formData = new FormData(form)
     const params = new URLSearchParams(window.location.search)
-    const response = await fetch('/api/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: formData.get('name'), phone: formData.get('phone'), serviceInterest: formData.get('service'),
-        comment: formData.get('comment'), website: formData.get('website'), consent: formData.get('consent') === 'on',
-        preferredContact: 'phone', locale, utmSource: params.get('utm_source'), utmCampaign: params.get('utm_campaign'),
-      }),
-    })
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'), phone: formData.get('phone'), serviceInterest: formData.get('service'),
+          comment: formData.get('comment'), website: formData.get('website'), consent: formData.get('consent') === 'on',
+          preferredContact: 'phone', locale, utmSource: params.get('utm_source'), utmCampaign: params.get('utm_campaign'),
+        }),
+      })
 
-    if (response.ok) {
+      if (!response.ok) {
+        setState('error')
+        return
+      }
       form.reset()
       setState('success')
-    } else setState('error')
+    } catch {
+      setState('error')
+    }
   }
 
   return (

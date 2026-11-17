@@ -1,67 +1,98 @@
-import configPromise from '@payload-config'
+import config from '@payload-config'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
 
 import { XonInterior } from '@/components/XonInterior'
 import RichText from '@/components/RichText'
 import { LeadForm } from '@/components/XonHome/LeadForm'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
-import { getSeededDoctorPhoto } from '@/lib/doctorPhotos'
+import { doctorProfile } from '@/lib/xonDoctors'
+import { xonCopy } from '@/lib/xonCopy'
+import { httpsLink, officialDoctorReel, officialDoctorVideo, videoEmbed } from '@/lib/xonVideo'
+import { visitGuideSlug } from '@/lib/xonArticles'
 
-const fallbackDoctors = {
-  'xursand-yusupboyevich': { name: 'Хурсанд Юсупбоевич', specialty: 'Гастроэнтерология', position: 'Основатель, главный врач', shortBio: 'Консультация и сопровождение пациентов по вопросам здоровья пищеварительной системы.' },
-  'fayzullo-narzullayevich': { name: 'Файзулло Нарзуллаевич', specialty: 'Неврология', position: 'Врач-невролог', shortBio: 'Диагностика и сопровождение пациентов с заболеваниями нервной системы.' },
-  'zafar-abdirazzakov': { name: 'Зафар Абдираззаков', specialty: 'Ортопедия и вертебрология', position: 'Ортопед-вертебролог', shortBio: 'Работа с заболеваниями позвоночника, суставов и нарушениями движения.' },
-  'dilshod-abdusammatovich': { name: 'Дилшод Абдусамматович', specialty: 'Онкология', position: 'Врач-онколог', shortBio: 'Консультация по вопросам онкологической диагностики и маршрутизации пациента.' },
-  'ruslan-alisherovich': { name: 'Руслан Алишерович', specialty: 'Онкология', position: 'Врач-онколог', shortBio: 'Экспертная консультация и сопровождение в рамках подтверждённых возможностей клиники.' },
-  'vohid-latipov': { name: 'Вохид Латипов', specialty: 'Дерматология и трихология', position: 'Врач-дерматолог', shortBio: 'Диагностика и лечение заболеваний кожи, волос и кожи головы.' },
-} as const
+export default async function DoctorDetailPage({ params }: { params: Promise<{ locale: SiteLocale; slug: string }> }) {
+  const { locale, slug } = await params
+  if (!localeCodes.includes(locale)) notFound()
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({ collection: 'doctors', locale, fallbackLocale: false, where: { slug: { equals: slug } }, limit: 1, depth: 2 })
+  const doctor = doctorProfile(locale, slug, docs[0])
+  if (!doctor) notFound()
 
-function getVideoEmbed(url?: string | null) {
-  if (!url) return null
-  try {
-    const parsed = new URL(url)
-    if (parsed.hostname === 'youtu.be') return `https://www.youtube-nocookie.com/embed/${parsed.pathname.slice(1)}`
-    if (['youtube.com', 'www.youtube.com'].includes(parsed.hostname)) {
-      const id = parsed.searchParams.get('v')
-      return id ? `https://www.youtube-nocookie.com/embed/${id}` : null
-    }
-    if (['vimeo.com', 'www.vimeo.com'].includes(parsed.hostname)) return `https://player.vimeo.com/video/${parsed.pathname.split('/').filter(Boolean)[0]}`
-  } catch { return null }
-  return null
-}
-
-export default async function DoctorDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { locale: rawLocale, slug } = await params
-  if (!localeCodes.includes(rawLocale as SiteLocale)) notFound()
-  const locale = rawLocale as SiteLocale
-  const payload = await getPayload({ config: configPromise })
-  const result = await payload.find({ collection: 'doctors', locale, fallbackLocale: 'ru', where: { slug: { equals: slug } }, limit: 1, depth: 2 })
-  const doctor = result.docs[0]
-  const fallback = fallbackDoctors[slug as keyof typeof fallbackDoctors]
-  if (!doctor && !fallback) notFound()
-  const name = doctor?.name || fallback.name
-  const specialty = doctor?.specialty || fallback.specialty
-  const position = doctor?.position || fallback.position
-  const shortBio = doctor?.shortBio || fallback.shortBio
-  const photo = (doctor && typeof doctor.photo === 'object' && doctor.photo?.url ? doctor.photo.url : undefined) || getSeededDoctorPhoto(slug)
-  const videoEmbed = getVideoEmbed(doctor?.videoUrl)
+  const ui = xonCopy(locale)
+  const t = content[locale]
+  const reel = officialDoctorReel(slug)
+  const primaryVideo = doctor.videoUrl || officialDoctorVideo(slug) || reel
   const videos = [
-    ...(videoEmbed ? [{ title: doctor?.videoTitle || `Знакомство с врачом — ${name}`, description: 'Врач рассказывает о своём подходе, опыте и ситуациях, с которыми к нему обращаются.', embed: videoEmbed }] : []),
-    ...(doctor?.videos || []).map((video) => ({ title: video.title, description: video.description, embed: getVideoEmbed(video.url) })).filter((video) => video.embed),
+    ...(primaryVideo ? [{ title: doctor.videoTitle || ui.videoTitle, url: primaryVideo, description: null }] : []),
+    ...(doctor.videos || []),
+  ].flatMap((video) => {
+    const embed = videoEmbed(video.url)
+    return embed ? [{ ...video, embed }] : []
+  })
+  const handle = doctor.instagram?.replace(/^@/, '')
+  const instagram = handle && /^[\w.]+$/.test(handle) ? `https://www.instagram.com/${handle}/` : httpsLink(doctor.instagram)
+  const facts = [
+    [ui.specialty, doctor.specialty], [ui.experience, doctor.experience], [ui.category, doctor.category],
+    [ui.education, doctor.education], [ui.languages, doctor.languages?.map(({ label }) => label).join(' · ')],
   ]
-  const labels = content[locale]
+  const appointment = [[ui.schedule, doctor.schedule], [ui.primaryPrice, doctor.primaryPrice], [ui.followUpPrice, doctor.followUpPrice]]
 
-  return <XonInterior locale={locale} eyebrow={specialty} title={name} intro={shortBio} index="02">
-    <section className="xon-page-content xon-detail">
-      <div className="xon-detail-media" style={photo ? { backgroundImage: `url(${photo})` } : undefined} />
-      <div className="xon-detail-copy"><h2>{position}</h2><div className="xon-detail-meta"><div><small>Специализация</small><strong>{specialty}</strong></div><div><small>Опыт</small><strong>{doctor?.experience || 'Уточняется'}</strong></div>{doctor?.category && <div><small>Категория</small><strong>{doctor.category}</strong></div>}{doctor?.languages?.length ? <div><small>Языки приёма</small><strong>{doctor.languages.map((item) => item.label).join(' · ')}</strong></div> : null}{doctor?.education && <div><small>Образование</small><strong>{doctor.education}</strong></div>}{doctor?.hometown && <div><small>Город</small><strong>{doctor.hometown}</strong></div>}</div>{doctor?.bio ? <RichText data={doctor.bio} enableGutter={false} className="xon-richtext" /> : <p>{shortBio}</p>}<div className="xon-social-links">{doctor?.instagram && <a className="xon-social-link" href={`https://instagram.com/${doctor.instagram.replace('@', '')}`} target="_blank" rel="noreferrer">Instagram · {doctor.instagram}</a>}{doctor?.socialLinks?.map((social) => <a className="xon-social-link" href={social.url} target="_blank" rel="noreferrer" key={social.id || `${social.label}-${social.url}`}>{social.label} ↗</a>)}</div><p><small>Информация о квалификации и стаже будет дополнена после документального подтверждения клиникой.</small></p></div>
+  return <XonInterior locale={locale} eyebrow={doctor.specialty} title={doctor.name} intro={doctor.position} index="02">
+    <section className={`xon-page-content xon-detail${doctor.photoUrl ? '' : ' xon-detail-no-photo'}`}>
+      {doctor.photoUrl && <div className="xon-profile-photo"><Image src={doctor.photoUrl} alt={doctor.name} fill sizes="(max-width: 900px) 88vw, 38vw" unoptimized={!doctor.photoUrl.startsWith('/doctors/')} /></div>}
+      <div className="xon-detail-copy">
+        <h2>{ui.bio}</h2>
+        {doctor.bio ? <RichText data={doctor.bio} enableGutter={false} className="xon-richtext" /> : doctor.shortBio && <p>{doctor.shortBio}</p>}
+        <dl className="xon-detail-meta">{facts.filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+        <div className="xon-social-links">
+          {instagram && <a className="xon-social-link" href={instagram} target="_blank" rel="noreferrer">Instagram {handle && /^[\w.]+$/.test(handle) ? `· @${handle}` : ''}</a>}
+          {doctor.socialLinks?.map((social) => {
+            const url = httpsLink(social.url)
+            return url && <a className="xon-social-link" href={url} target="_blank" rel="noreferrer" key={social.id || url}>{social.label} ↗</a>
+          })}
+          <Link className="xon-social-link" href={`/${locale}/articles/${visitGuideSlug}`}>{ui.visit} ↗</Link>
+        </div>
+      </div>
     </section>
-    {(doctor?.schedule || doctor?.primaryPrice || doctor?.followUpPrice) && <section className="xon-doctor-facts"><div><small>График приёма</small><strong>{doctor.schedule || 'По предварительной записи'}</strong></div><div><small>Первичный приём</small><strong>{doctor.primaryPrice || 'Уточняется'}</strong></div><div><small>Повторный приём</small><strong>{doctor.followUpPrice || 'Уточняется'}</strong></div></section>}
-    {(doctor?.focusAreas?.length || doctor?.procedures?.length) && <section className="xon-doctor-expertise"><div><p className="xon-label light">Профиль врача<span>экспертиза</span></p><h2>С чем можно обратиться</h2></div><div className="xon-expertise-columns">{doctor.focusAreas?.length ? <div><h3>Направления</h3><ul>{doctor.focusAreas.map((item) => <li key={item.id || item.label}>{item.label}</li>)}</ul></div> : null}{doctor.procedures?.length ? <div><h3>Методы и процедуры</h3><ul>{doctor.procedures.map((item) => <li key={item.id || item.label}>{item.label}</li>)}</ul></div> : null}</div></section>}
-    {videos.length > 0 && <section className="xon-doctor-videos"><div className="xon-section-title"><p className="xon-kicker"><span />Видео врача</p><h2>Знакомство и полезные материалы</h2></div><div className="xon-video-grid">{videos.map((video, index) => <article key={`${video.title}-${index}`}><div className="xon-video-frame"><iframe src={video.embed || undefined} title={video.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div><span>{String(index + 1).padStart(2, '0')}</span><h3>{video.title}</h3>{video.description && <p>{video.description}</p>}</article>)}</div></section>}
-    {doctor?.credentials?.length ? <section className="xon-page-content"><div className="xon-filter-note"><span>Образование</span><span>квалификация</span></div><div className="xon-credentials">{doctor.credentials.map((item) => <article key={item.id || item.title}><span>{item.year || '—'}</span><div><h3>{item.title}</h3><p>{item.institution}</p></div></article>)}</div></section> : null}
-    {doctor?.articles?.length ? <section className="xon-page-content"><div className="xon-filter-note"><span>Материалы врача</span><span>статьи и выступления</span></div><div className="xon-list-grid">{doctor.articles.map((article, index) => article.url ? <a className="xon-list-card" href={article.url} target="_blank" rel="noreferrer" key={article.id || article.title}><span>{String(index + 1).padStart(2, '0')}</span><h2>{article.title}</h2><p>{article.summary}</p></a> : <article className="xon-list-card" key={article.id || article.title}><span>{String(index + 1).padStart(2, '0')}</span><h2>{article.title}</h2><p>{article.summary}</p></article>)}</div></section> : null}
-    <section className="xon-doctor-booking"><div><p className="xon-label light">Запись к врачу<span>онлайн</span></p><h2>Записаться к {name}</h2><p>Администратор свяжется, уточнит задачу и предложит доступное время.</p></div><LeadForm locale={locale} labels={labels} defaultService={`${name} — ${specialty}`} /></section>
+    {appointment.some(([, value]) => value) && <section className="xon-doctor-facts">{appointment.map(([label, value]) => value && <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</section>}
+    {Boolean(doctor.focusAreas?.length || doctor.procedures?.length) && <section className="xon-doctor-expertise">
+      <div><h2>{ui.reasons}</h2></div>
+      <div className="xon-expertise-columns">
+        {Boolean(doctor.focusAreas?.length) && <div><h3>{t.nav[0]}</h3><ul>{doctor.focusAreas?.map((item) => <li key={item.id || item.label}>{item.label}</li>)}</ul></div>}
+        {Boolean(doctor.procedures?.length) && <div><h3>{ui.procedures}</h3><ul>{doctor.procedures?.map((item) => <li key={item.id || item.label}>{item.label}</li>)}</ul></div>}
+      </div>
+    </section>}
+    {videos.length > 0 && <section className="xon-doctor-videos">
+      <div className="xon-section-title"><h2>{ui.video}</h2></div>
+      <div className="xon-video-grid">{videos.map((video) => <article key={video.embed}>
+        <div className={`xon-video-frame${video.url.includes('/shorts/') || video.url.includes('/reel/') ? ' xon-video-vertical' : ''}`}>
+          <iframe src={video.embed} title={video.title} loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
+        </div>
+        <h3>{video.title}</h3>{video.description && <p>{video.description}</p>}
+        <div className="xon-social-links">
+          <a className="xon-social-link" href={video.url} target="_blank" rel="noreferrer">{video.url.includes('instagram.com') ? 'Instagram' : ui.more} ↗</a>
+          {reel && video.url === primaryVideo && reel !== primaryVideo && <a className="xon-social-link" href={reel} target="_blank" rel="noreferrer">Instagram ↗</a>}
+        </div>
+      </article>)}</div>
+    </section>}
+    {Boolean(doctor.credentials?.length) && <section className="xon-page-content">
+      <div className="xon-section-title"><h2>{ui.education}</h2></div>
+      <div className="xon-credentials">{doctor.credentials?.map((item) => <article key={item.id || item.title}><span>{item.year}</span><div><h3>{item.title}</h3><p>{item.institution}</p></div></article>)}</div>
+    </section>}
+    {Boolean(doctor.articles?.length) && <section className="xon-page-content">
+      <div className="xon-section-title"><h2>{ui.journal}</h2></div>
+      <div className="xon-list-grid">{doctor.articles?.map((article) => {
+        const url = httpsLink(article.url)
+        const copy = <><h3>{article.title}</h3><p>{article.summary}</p></>
+        return url ? <a className="xon-list-card" href={url} target="_blank" rel="noreferrer" key={article.id || article.title}>{copy}</a> : <article className="xon-list-card" key={article.id || article.title}>{copy}</article>
+      })}</div>
+    </section>}
+    {doctor.acceptsAppointments !== false && <section className="xon-doctor-booking" id="appointment">
+      <div><h2>{t.primaryAction}</h2><p>{t.formText}</p></div>
+      <LeadForm locale={locale} labels={t} defaultService={`${doctor.name} · ${doctor.specialty}`} />
+    </section>}
   </XonInterior>
 }

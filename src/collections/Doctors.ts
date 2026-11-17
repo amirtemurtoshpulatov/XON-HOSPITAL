@@ -43,7 +43,7 @@ export const Doctors: CollectionConfig = {
       ],
     },
     { name: 'photo', label: 'Фотография', type: 'upload', relationTo: 'media' },
-    { name: 'videoUrl', label: 'Ссылка на видеовизитку (YouTube / Vimeo)', type: 'text' },
+    { name: 'videoUrl', label: 'Ссылка на видеовизитку (YouTube / Vimeo / Instagram)', type: 'text' },
     { name: 'videoTitle', label: 'Заголовок видеовизитки', type: 'text', localized: true },
     { name: 'videoPoster', label: 'Обложка видео', type: 'upload', relationTo: 'media' },
     {
