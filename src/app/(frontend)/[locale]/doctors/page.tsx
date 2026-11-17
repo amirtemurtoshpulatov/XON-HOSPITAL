@@ -19,7 +19,7 @@ export default async function DoctorsPage({ params }: { params: Promise<{ locale
   const doctors = doctorDirectory(locale, result.docs)
   const copy = interiorCopy[locale].doctors
 
-  return <XonInterior locale={locale} eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="02">
+  return <XonInterior locale={locale} videoSection="doctors" eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="02">
     <section className="xon-page-content">
       <div className="xon-team-portraits">{doctors.map((doctor) =>
         <Link key={doctor.slug} className="xon-portrait-card" href={`/${locale}/doctors/${doctor.slug}`}>

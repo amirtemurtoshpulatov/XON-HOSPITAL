@@ -24,7 +24,7 @@ export default async function ArticlesPage({ params }: { params: Promise<{ local
     depth: 0,
   })
   const guides = docs.filter((page) => page.slug?.startsWith('guide-') && page.title && page.layout?.length)
-  return <XonInterior locale={locale} eyebrow="XON HOSPITAL" title={ui.journal}>
+  return <XonInterior locale={locale} videoSection="articles" eyebrow="XON HOSPITAL" title={ui.journal}>
     <section className="xon-page-content xon-list-grid">
       {articleSlugs.map((slug) => {
         const article = articleCopy(locale, slug)!

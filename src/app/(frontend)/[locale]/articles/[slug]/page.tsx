@@ -25,7 +25,7 @@ export default async function ArticlePage({ params }: Props) {
   const article = articleCopy(locale, slug)
   if (!article) notFound()
   const ui = xonCopy(locale)
-  return <XonInterior locale={locale} eyebrow={ui.journal} title={article.title} intro={article.description}>
+  return <XonInterior locale={locale} videoSection={`articles/${slug}`} eyebrow={ui.journal} title={article.title} intro={article.description}>
     <article className="xon-page-content xon-guide">
       {article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
       <p>{ui.source} · <a href={article.source} target="_blank" rel="noreferrer">MedlinePlus (EN) ↗</a></p>

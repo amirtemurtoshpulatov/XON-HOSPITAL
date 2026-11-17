@@ -29,7 +29,8 @@ export function videoEmbed(url: string) {
   try {
     const parsed = new URL(url)
     if (parsed.protocol !== 'https:') return null
-    const [section, pathId] = parsed.pathname.split('/').filter(Boolean)
+    const parts = parsed.pathname.split('/').filter(Boolean)
+    const [section, pathId] = parts
     if (['www.youtube.com', 'youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtube-nocookie.com'].includes(parsed.hostname)) {
       const id = parsed.hostname === 'youtu.be' ? section : ['shorts', 'embed'].includes(section) ? pathId : parsed.searchParams.get('v')
       return id && /^[\w-]{11}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null
@@ -38,8 +39,12 @@ export function videoEmbed(url: string) {
       const id = section === 'video' ? pathId : section
       return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null
     }
-    if (['www.instagram.com', 'instagram.com'].includes(parsed.hostname) && ['reel', 'p'].includes(section) && /^[\w-]+$/.test(pathId || '')) {
-      return `https://www.instagram.com/${section}/${pathId}/embed/`
+    if (['www.instagram.com', 'instagram.com'].includes(parsed.hostname)) {
+      const kinds = ['reel', 'reels', 'p', 'tv']
+      const [kind, id] = kinds.includes(section) ? parts : parts.slice(1)
+      if (kinds.includes(kind) && /^[\w-]+$/.test(id || '')) {
+        return `https://www.instagram.com/${kind === 'reels' ? 'reel' : kind}/${id}/embed/`
+      }
     }
   } catch {
     return null

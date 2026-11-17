@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { videoFields } from '@/fields/video'
 
 export const Doctors: CollectionConfig = {
   slug: 'doctors',
@@ -47,11 +48,16 @@ export const Doctors: CollectionConfig = {
     { name: 'videoTitle', label: 'Заголовок видеовизитки', type: 'text', localized: true },
     { name: 'videoPoster', label: 'Обложка видео', type: 'upload', relationTo: 'media' },
     {
-      name: 'videos', label: 'Дополнительные видео врача', type: 'array', localized: true,
+      name: 'videoLibrary', label: 'Видео врача: Reels, ссылки и файлы', type: 'array', localized: true,
+      fields: videoFields(),
+    },
+    {
+      name: 'videos', label: 'Ранее добавленные ссылки на видео', type: 'array', localized: true,
+      admin: { initCollapsed: true },
       fields: [
         { name: 'title', label: 'Заголовок', type: 'text', required: true },
         { name: 'description', label: 'Описание', type: 'textarea' },
-        { name: 'url', label: 'Ссылка YouTube / Vimeo', type: 'text', required: true },
+        { name: 'url', label: 'Ссылка', type: 'text', required: true },
       ],
     },
     { name: 'gallery', label: 'Галерея врача', type: 'upload', relationTo: 'media', hasMany: true },

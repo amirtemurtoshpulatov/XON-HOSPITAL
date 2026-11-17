@@ -15,5 +15,5 @@ export default async function CmsPage({ params }: { params: Promise<{ locale: st
   const page = result.docs[0]
   if (!page?.title || !page.layout?.length) notFound()
 
-  return <XonInterior locale={locale} eyebrow="XON HOSPITAL" title={page.title} index="06"><section className="xon-page-content"><RenderBlocks blocks={page.layout} /></section></XonInterior>
+  return <XonInterior locale={locale} videoSection={`page/${slug}`} eyebrow="XON HOSPITAL" title={page.title} index="06"><section className="xon-page-content"><RenderBlocks blocks={page.layout} /></section></XonInterior>
 }
