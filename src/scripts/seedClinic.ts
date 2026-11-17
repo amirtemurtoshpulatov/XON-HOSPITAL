@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { doctorProfile } from '@/lib/xonDoctors'
+import { localeCodes } from '@/components/XonHome/content'
 
 const doctors = [
   {
@@ -195,7 +197,12 @@ const serviceDetails: Record<string, {
 
 async function main() {
   const payload = await getPayload({ config: configPromise })
+  const chiefSlug = 'xursand-yusupboyevich'
+  const existingChief = await payload.find({
+    collection: 'doctors', where: { slug: { equals: chiefSlug } }, limit: 1, depth: 0,
+  })
 
+  let skipBaseSeed = false
   if (process.env.SEED_MODE === 'if-empty') {
     const [doctorCount, serviceCount] = await Promise.all([
       payload.count({ collection: 'doctors' }),
@@ -203,9 +210,28 @@ async function main() {
     ])
 
     if (doctorCount.totalDocs > 0 && serviceCount.totalDocs > 0) {
-      payload.logger.info('Clinic seed skipped: database already contains clinic content')
-      return
+      skipBaseSeed = true
     }
+  }
+
+  if (!existingChief.docs[0]) {
+    const chief = doctorProfile('ru', chiefSlug)!
+    const record = await payload.create({ collection: 'doctors', locale: 'ru', data: {
+      slug: chiefSlug, name: chief.name, specialty: chief.specialty, position: chief.position,
+      shortBio: chief.shortBio, instagram: chief.instagram, focusAreas: chief.focusAreas, sortOrder: 1,
+    } })
+    for (const locale of localeCodes.filter((code) => code !== 'ru')) {
+      const profile = doctorProfile(locale, chiefSlug)!
+      await payload.update({ collection: 'doctors', id: record.id, locale, data: {
+        name: profile.name, specialty: profile.specialty, position: profile.position,
+        shortBio: profile.shortBio, focusAreas: profile.focusAreas,
+      } })
+    }
+  }
+
+  if (skipBaseSeed) {
+    payload.logger.info('Clinic seed skipped: database already contains clinic content')
+    return
   }
 
   for (const doctor of doctors) {

@@ -1,12 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export function XonBrand({ href, footer = false }: { href: string; footer?: boolean }) {
+export function XonBrand({ href, footer = false, label = 'XON HOSPITAL' }: { href: string; footer?: boolean; label?: string }) {
   return (
     <Link
       className={`xon-brand${footer ? ' xon-brand-footer' : ''}`}
       href={href}
-      aria-label="XON HOSPITAL — главная"
+      aria-label={label}
     >
       <Image
         src="/xon-hospital-logo.jpeg"

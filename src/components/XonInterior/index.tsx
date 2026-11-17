@@ -4,13 +4,11 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { ArrowUpRight } from 'lucide-react'
 
-import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
-import { XonBrand } from '@/components/XonBrand'
+import { content, type SiteLocale } from '@/components/XonHome/content'
+import { XonHeader } from '@/components/XonHeader'
 import { XonFooter } from '@/components/XonFooter'
 import '@/components/XonHome/styles.css'
 import './styles.css'
-
-const languageLabels: Record<SiteLocale, string> = { ru: 'RU', uz: 'UZ', en: 'EN', kk: 'KZ', tg: 'TJ' }
 
 export async function XonInterior({
   locale,
@@ -28,7 +26,7 @@ export async function XonInterior({
   children: ReactNode
 }) {
   const payload = await getPayload({ config: configPromise })
-  const settings = await payload.findGlobal({ slug: 'site-settings', locale, fallbackLocale: 'ru' })
+  const settings = await payload.findGlobal({ slug: 'site-settings', locale, fallbackLocale: false })
   const t = content[locale]
   const prefix = `/${locale}`
   const palette = settings.palette
@@ -40,21 +38,8 @@ export async function XonInterior({
   } as CSSProperties
 
   return (
-    <main className="xon-site xon-interior" style={paletteStyle}>
-      <header className="xon-header">
-        <XonBrand href={prefix} />
-        <nav className="xon-nav" aria-label="Основная навигация">
-          <Link href={`${prefix}/services`}>{t.nav[0]}</Link>
-          <Link href={`${prefix}/doctors`}>{t.nav[1]}</Link>
-          <Link href={`${prefix}/about`}>{t.nav[2]}</Link>
-          <Link href={`${prefix}/prices`}>{t.nav[3]}</Link>
-          <Link href={`${prefix}/contacts`}>{t.nav[4]}</Link>
-        </nav>
-        <div className="xon-header-actions">
-          <details className="xon-languages"><summary>{languageLabels[locale]} <span>⌄</span></summary><div>{localeCodes.map((code) => <Link key={code} href={`/${code}`}>{languageLabels[code]}</Link>)}</div></details>
-          <Link className="xon-header-cta" href={`${prefix}/contacts#appointment`}>{t.primaryAction}<ArrowUpRight size={16} /></Link>
-        </div>
-      </header>
+    <main className="xon-site xon-interior" lang={locale} style={paletteStyle}>
+      <XonHeader locale={locale} />
 
       <section className="xon-page-hero">
         <div className="xon-page-grid" aria-hidden="true" />

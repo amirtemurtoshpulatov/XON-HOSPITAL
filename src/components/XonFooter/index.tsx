@@ -1,7 +1,9 @@
 import Link from 'next/link'
 
 import { XonBrand } from '@/components/XonBrand'
-import type { SiteLocale } from '@/components/XonHome/content'
+import { content, type SiteLocale } from '@/components/XonHome/content'
+import { clinicSocial, xonCopy } from '@/lib/xonCopy'
+import { serviceCopy } from '@/lib/xonServices'
 
 type FooterSettings = {
   address?: string | null
@@ -26,21 +28,8 @@ const labels: Record<SiteLocale, {
   tg: { clinic: 'Клиника', services: 'Самтҳо', contacts: 'Тамос', tagline: 'Клиникаи бисёрсоҳа бо роҳи равшани бемор аз ташхис то табобат ва барқарорсозӣ.', medicalNote: 'Маълумоти сомона машварати духтурро иваз намекунад.', developedBy: 'Сомонаро сохт' },
 }
 
-const clinicLinks = [
-  ['services', 'Услуги'],
-  ['doctors', 'Врачи'],
-  ['about', 'О клинике'],
-  ['prices', 'Цены'],
-  ['contacts', 'Контакты'],
-] as const
-
-const serviceLinks = [
-  ['check-up', 'Check-up'],
-  ['rehabilitation', 'Реабилитация'],
-  ['neurology', 'Неврология'],
-  ['orthopedics', 'Ортопедия'],
-  ['oncology', 'Онкология'],
-] as const
+const clinicLinks = ['services', 'doctors', 'about', 'prices', 'contacts']
+const serviceLinks = ['check-up', 'rehabilitation', 'neurology', 'orthopedics', 'oncology']
 
 function externalHref(value: string | null | undefined, network: 'telegram' | 'instagram') {
   if (!value) return null
@@ -52,8 +41,10 @@ function externalHref(value: string | null | undefined, network: 'telegram' | 'i
 export function XonFooter({ locale, settings }: { locale: SiteLocale; settings: FooterSettings }) {
   const prefix = `/${locale}`
   const t = labels[locale]
-  const telegram = externalHref(settings.telegram, 'telegram')
-  const instagram = externalHref(settings.instagram, 'instagram')
+  const ui = xonCopy(locale)
+  const telegram = externalHref(settings.telegram, 'telegram') || clinicSocial.telegram
+  const phone = settings.phone || clinicSocial.phone
+  const instagram = externalHref(settings.instagram, 'instagram') || clinicSocial.instagram
 
   return (
     <footer className="xon-footer" id="contact">
@@ -64,20 +55,22 @@ export function XonFooter({ locale, settings }: { locale: SiteLocale; settings: 
         </div>
         <nav className="xon-footer-column" aria-label={t.clinic}>
           <h2>{t.clinic}</h2>
-          {clinicLinks.map(([slug, label]) => <Link href={`${prefix}/${slug}`} key={slug}>{label}</Link>)}
+          {clinicLinks.map((slug, index) => <Link href={`${prefix}/${slug}`} key={slug}>{content[locale].nav[index]}</Link>)}
+          <Link href={`${prefix}/articles`}>{ui.journal}</Link>
         </nav>
         <nav className="xon-footer-column" aria-label={t.services}>
           <h2>{t.services}</h2>
-          {serviceLinks.map(([slug, label]) => <Link href={`${prefix}/services/${slug}`} key={slug}>{label}</Link>)}
+          {serviceLinks.map((slug) => <Link href={`${prefix}/services/${slug}`} key={slug}>{serviceCopy(locale, slug)?.title}</Link>)}
         </nav>
         <div className="xon-footer-column xon-footer-contacts">
           <h2>{t.contacts}</h2>
-          <p>{settings.address || 'Ташкент, Узбекистан'}</p>
-          {settings.phone && <a className="xon-footer-phone" href={`tel:${settings.phone.replace(/[^\d+]/g, '')}`}>{settings.phone}</a>}
+          <p>{settings.address || ui.city}</p>
+          <a className="xon-footer-phone" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
           {settings.workingHours && <p>{settings.workingHours}</p>}
           <div className="xon-footer-socials">
             {telegram && <a href={telegram} target="_blank" rel="noreferrer">Telegram</a>}
-            {instagram && <a href={instagram} target="_blank" rel="noreferrer">Instagram</a>}
+            <a href={instagram} target="_blank" rel="noreferrer">Instagram</a>
+            <a href={clinicSocial.youtube} target="_blank" rel="noreferrer">YouTube</a>
           </div>
         </div>
       </div>
