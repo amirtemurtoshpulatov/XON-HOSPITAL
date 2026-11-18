@@ -3,6 +3,7 @@ import { ArrowUpRight, Check } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
 import { XonInterior } from '@/components/XonInterior'
+import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
 import RichText from '@/components/RichText'
 import { LeadForm } from '@/components/XonHome/LeadForm'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
@@ -62,6 +63,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const faq = service?.faq || []
 
   return <XonInterior locale={locale} videoSection={`services/${slug}`} eyebrow={service?.eyebrow || ui.info} title={title} intro={summary} index="01">
+    <ClinicBreadcrumbs locale={locale} section={{ path: '/services', label: t.nav[0] }} title={title} slug={slug} />
     {facts.length > 0 && <section className="xon-service-facts" aria-label={ui.facts}>{facts.map((fact) => <div key={fact.id || `${fact.label}-${fact.value}`}><small>{fact.label}</small><strong>{fact.value}</strong></div>)}</section>}
     <section className={`xon-page-content xon-detail${cover ? '' : ' xon-detail-no-photo'}`}>
       {cover && <div className="xon-detail-media" style={{ backgroundImage: `url(${cover})` }} />}

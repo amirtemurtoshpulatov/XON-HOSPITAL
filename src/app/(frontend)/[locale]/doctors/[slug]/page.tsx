@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { XonInterior } from '@/components/XonInterior'
+import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
 import { XonVideoSection, type XonVideoItem } from '@/components/XonVideo'
 import RichText from '@/components/RichText'
 import { LeadForm } from '@/components/XonHome/LeadForm'
@@ -53,6 +54,7 @@ export default async function DoctorDetailPage({ params }: Props) {
   const appointment = [[ui.schedule, doctor.schedule], [ui.primaryPrice, doctor.primaryPrice], [ui.followUpPrice, doctor.followUpPrice]]
 
   return <XonInterior locale={locale} videoSection={`doctors/${slug}`} appointmentHref={doctor.acceptsAppointments !== false ? '#appointment' : undefined} eyebrow={doctor.specialty} title={doctor.name} intro={doctor.position} index="02">
+    <ClinicBreadcrumbs locale={locale} section={{ path: '/doctors', label: t.nav[1] }} title={doctor.name} slug={slug} />
     <section className={`xon-page-content xon-detail${doctor.photoUrl ? '' : ' xon-detail-no-photo'}`}>
       {doctor.photoUrl && <div className="xon-profile-photo"><Image src={doctor.photoUrl} alt={doctor.name} fill sizes="(max-width: 900px) 88vw, 38vw" unoptimized={!doctor.photoUrl.startsWith('/doctors/')} /></div>}
       <div className="xon-detail-copy">

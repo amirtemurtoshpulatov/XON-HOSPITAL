@@ -7,7 +7,7 @@
 - приложение: Railway, Render, DigitalOcean App Platform, VPS с Docker или аналогичный Node.js-хостинг;
 - база: управляемый PostgreSQL с ежедневными резервными копиями;
 - медиа: постоянный диск/volume или S3-совместимое хранилище;
-- домен: `xonhospital.uz`;
+- домен: `xon-hospital.uz`;
 - HTTPS: бесплатный Let's Encrypt у хостинга или через Cloudflare.
 
 ## Обязательные переменные
@@ -15,7 +15,7 @@
 ```env
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DB
 PAYLOAD_SECRET=ДЛИННАЯ_СЛУЧАЙНАЯ_СТРОКА
-NEXT_PUBLIC_SERVER_URL=https://xonhospital.uz
+NEXT_PUBLIC_SERVER_URL=https://xon-hospital.uz
 CRON_SECRET=ДРУГАЯ_СЛУЧАЙНАЯ_СТРОКА
 PREVIEW_SECRET=ЕЩЁ_ОДНА_СЛУЧАЙНАЯ_СТРОКА
 GOOGLE_SHEETS_WEBHOOK_URL=
@@ -87,8 +87,23 @@ pnpm start
 
 ## Обновление и откат
 
+Сервер Fornex разворачивает ветку `codex/vps-production`. После проверки и отправки изменений в эту ветку выполните на VPS:
+
+```bash
+cd /opt/xon-hospital
+git pull --ff-only origin codex/vps-production
+docker compose --env-file .env.production -f compose.production.yml up -d --build
+```
+
 1. Сделать backup PostgreSQL и каталога медиа.
 2. Развернуть новую версию в staging.
 3. Проверить `/`, `/ru`, `/admin` и тестовую заявку.
 4. Переключить production на новую версию.
 5. Для отката вернуть предыдущий Docker image/commit и восстановить backup только при несовместимой миграции.
+
+## Индексация сайта
+
+1. Добавьте доменный ресурс `xon-hospital.uz` в [Google Search Console](https://search.google.com/search-console/). Подтвердите владение записью TXT в DNS-зоне у текущего DNS-провайдера.
+2. В разделе «Файлы Sitemap» отправьте `https://xon-hospital.uz/sitemap.xml`.
+3. В «Проверке URL» запросите индексацию для `https://xon-hospital.uz/ru` и `https://xon-hospital.uz/uz`. По остальным страницам следите за отчётом «Индексирование страниц».
+4. Публикуйте новые материалы в нужных языковых версиях. Публичные страницы, врачи, услуги и статьи автоматически попадают в sitemap при наличии опубликованного контента на соответствующем языке.

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
+import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 import { interiorCopy } from '@/components/XonInterior/copy'
 import { xonCopy } from '@/lib/xonCopy'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -23,6 +23,29 @@ export function indexableSite() {
 
 export const staticSections = ['', '/services', '/doctors', '/about', '/prices', '/contacts', '/articles'] as const
 type StaticSection = (typeof staticSections)[number]
+
+const homeSearchCopy = {
+  ru: {
+    title: 'XON Hospital — многопрофильная клиника в Ташкенте',
+    description: 'Консультации врачей, УЗИ, комплексный чекап и реабилитация в XON Hospital в Ташкенте. Выберите специалиста и оставьте заявку на приём.',
+  },
+  uz: {
+    title: 'XON Hospital — Toshkentdagi ko‘p tarmoqli klinika',
+    description: 'Toshkentdagi XON Hospital klinikasida shifokor maslahati, UZI, kompleks tibbiy tekshiruv va reabilitatsiya. Mutaxassisni tanlang va qabulga yoziling.',
+  },
+  en: {
+    title: 'XON Hospital — Multispecialty clinic in Tashkent',
+    description: 'Find a doctor at XON Hospital in Tashkent for consultations, ultrasound, health checkups and rehabilitation. Request an appointment online.',
+  },
+  kk: {
+    title: 'XON Hospital — Ташкенттегі көпсалалы клиника',
+    description: 'Ташкенттегі XON Hospital клиникасында дәрігер кеңесі, УДЗ, кешенді тексеру және оңалту. Маман таңдап, қабылдауға жазылыңыз.',
+  },
+  tg: {
+    title: 'XON Hospital — клиникаи бисёрсоҳа дар Тошканд',
+    description: 'Дар клиникаи XON Hospital дар Тошканд машварати табибон, УЗИ, муоинаи ҳамаҷониба ва барқарорсозӣ дастрас аст. Барои қабул дархост фиристед.',
+  },
+} satisfies Record<SiteLocale, { title: string; description: string }>
 
 export function localizedURLs(path: string, locales: readonly SiteLocale[] = localeCodes) {
   const pairs = locales.map((code) => [code, new URL(`/${code}${path}`, siteOrigin()).href])
@@ -63,8 +86,8 @@ export async function sectionMetadata(params: Promise<{ locale: string }>, path:
   const locale = localeCodes.find((code) => code === rawLocale)
   if (!locale) return {}
   if (path === '') {
-    const copy = content[locale]
-    return pageSEO(locale, path, { title: `${copy.heroTitle} ${copy.heroAccent}`, description: copy.heroText })
+    const copy = homeSearchCopy[locale]
+    return { ...pageSEO(locale, path, copy), title: { absolute: copy.title } }
   }
   if (path === '/articles') {
     const copy = xonCopy(locale)

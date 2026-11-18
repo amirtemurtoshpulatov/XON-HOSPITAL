@@ -12,15 +12,16 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { localeCodes } from '@/components/XonHome/content'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+  return doc?.title || 'XON HOSPITAL'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
-  const url = getServerSideURL()
-
-  return doc?.slug ? `${url}/${doc.slug}` : url
+const generateURL: GenerateURL<Post | Page> = ({ collectionConfig, doc, locale }) => {
+  const lang = localeCodes.find((code) => code === locale) || 'ru'
+  const base = collectionConfig?.slug === 'posts' ? '/posts' : `/${lang}/page`
+  return new URL(doc?.slug ? `${base}/${doc.slug}` : `/${lang}`, getServerSideURL()).href
 }
 
 export const plugins: Plugin[] = [

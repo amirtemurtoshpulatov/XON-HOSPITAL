@@ -28,6 +28,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
   const ui = xonCopy(locale)
   const fallback = content[locale]
   const prefix = `/${locale}`
+  const origin = siteOrigin()
   const payload = await getPayload({ config })
   const [home, settings, services, doctors, videos, articles] = await Promise.all([
     payload.findGlobal({ slug: 'home-page', locale, fallbackLocale: false, depth: 2 }),
@@ -94,11 +95,19 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
 
   return <main className="xon-site" lang={locale} style={style}>
     <JsonLd data={{
-      '@type': 'MedicalClinic', name: settings.clinicName || 'XON Hospital',
-      '@id': `${siteOrigin()}/ru#clinic`, url: `${siteOrigin()}${prefix}`, telephone: phone,
-      address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressCountry: 'UZ' },
-      sameAs: [clinicSocial.instagram, clinicSocial.youtube],
-      image: `${siteOrigin()}/xon-hospital-logo.jpeg`,
+      '@graph': [
+        {
+          '@type': 'WebSite', '@id': `${origin}/#website`, name: 'XON Hospital', url: `${origin}/`,
+          publisher: { '@id': `${origin}/ru#clinic` },
+        },
+        {
+          '@type': 'MedicalClinic', name: settings.clinicName || 'XON Hospital',
+          '@id': `${origin}/ru#clinic`, url: `${origin}/ru`, telephone: phone.replace(/[^\d+]/g, ''),
+          address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressLocality: 'Tashkent', addressCountry: 'UZ' },
+          sameAs: [clinicSocial.instagram, clinicSocial.youtube],
+          image: `${origin}/xon-hospital-logo.jpeg`, logo: `${origin}/xon-hospital-logo.jpeg`,
+        },
+      ],
     }} />
     <XonHeader locale={locale} home />
     <section className="xon-hero-v2" id="about">

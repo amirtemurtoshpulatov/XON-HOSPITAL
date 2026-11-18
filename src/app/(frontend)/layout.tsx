@@ -9,20 +9,20 @@ import { AdminBar } from '@/components/AdminBar'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
+import { draftMode, headers } from 'next/headers'
 
 import './globals.css'
 import { indexableSite, siteOrigin } from '@/lib/xonSeo'
+import { localeCodes } from '@/components/XonHome/content'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
+  const [{ isEnabled }, requestHeaders] = await Promise.all([draftMode(), headers()])
+  const locale = localeCodes.find((code) => code === requestHeaders.get('x-xon-locale')) || 'ru'
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="ru" suppressHydrationWarning>
+    <html className={cn(GeistSans.variable, GeistMono.variable)} lang={locale} suppressHydrationWarning>
       <head>
         <InitTheme />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
         <Providers>
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
   },
   description: 'Диагностика, лечение и реабилитация в многопрофильной клинике XON HOSPITAL.',
   icons: {
-    icon: [{ url: '/xon-hospital-logo.jpeg', type: 'image/jpeg' }],
-    apple: '/xon-hospital-logo.jpeg',
+    icon: [{ url: '/xon-favicon.png', sizes: '96x96', type: 'image/png' }],
+    apple: [{ url: '/xon-apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: mergeOpenGraph({
     images: [{ url: '/xon-hospital-logo.jpeg', width: 720, height: 720, alt: 'XON HOSPITAL' }],

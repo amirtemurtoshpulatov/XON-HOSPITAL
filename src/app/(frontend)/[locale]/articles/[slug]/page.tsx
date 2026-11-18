@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { XonInterior } from '@/components/XonInterior'
+import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
 import { JsonLd } from '@/components/JsonLd'
 import RichText from '@/components/RichText'
 import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
@@ -47,28 +48,18 @@ export default async function ArticlePage({ params }: Props) {
   const sources = (entry?.sources || (baseline ? [{ label: 'MedlinePlus', url: baseline.source }] : []))
     .filter((source) => httpsLink(source.url))
   const url = new URL(`/${locale}/articles/${slug}`, siteOrigin()).href
-  const parent = new URL(`/${locale}/articles`, siteOrigin()).href
   const languages = baseline ? localeCodes : await articleLocales(slug)
 
   return <XonInterior locale={locale} videoSection={`articles/${slug}`} eyebrow={ui.journal} title={article.title} intro={article.description} translatedLocales={languages} untranslatedPath="/articles">
+    <ClinicBreadcrumbs locale={locale} section={{ path: '/articles', label: ui.journal }} title={article.title} slug={slug} />
     <JsonLd data={{
-      '@graph': [
-        {
-          '@type': 'Article', mainEntityOfPage: url, headline: article.title, description: article.description,
-          inLanguage: locale, datePublished: entry?.publishedAt ?? undefined, dateModified: entry?.updatedAt,
-          image: image?.url ? new URL(image.url, siteOrigin()).href : undefined,
-          author: entry?.authorName ? { '@type': 'Person', name: entry.authorName } : undefined,
-          reviewedBy: entry?.reviewerName ? { '@type': 'Person', name: entry.reviewerName } : undefined,
-          publisher: { '@type': 'Organization', name: 'XON Hospital', url: siteOrigin() },
-          citation: sources.map((source) => source.url),
-        },
-        {
-          '@type': 'BreadcrumbList', itemListElement: [
-            { '@type': 'ListItem', position: 1, name: ui.journal, item: parent },
-            { '@type': 'ListItem', position: 2, name: article.title, item: url },
-          ],
-        },
-      ],
+      '@type': 'Article', mainEntityOfPage: url, headline: article.title, description: article.description,
+      inLanguage: locale, datePublished: entry?.publishedAt ?? undefined, dateModified: entry?.updatedAt,
+      image: image?.url ? new URL(image.url, siteOrigin()).href : undefined,
+      author: entry?.authorName ? { '@type': 'Person', name: entry.authorName } : undefined,
+      reviewedBy: entry?.reviewerName ? { '@type': 'Person', name: entry.reviewerName } : undefined,
+      publisher: { '@type': 'Organization', '@id': `${siteOrigin()}/ru#clinic`, name: 'XON Hospital', url: `${siteOrigin()}/ru` },
+      citation: sources.map((source) => source.url),
     }} />
     <article className="xon-page-content xon-guide">
       <Link href={`/${locale}/articles`}>← {ui.journal}</Link>
