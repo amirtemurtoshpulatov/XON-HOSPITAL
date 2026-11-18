@@ -10,3 +10,7 @@
 
 	reverse_proxy web:3000
 }
+
+{$WWW_SITE_ADDRESS:localhost} {
+	redir {$CANONICAL_ORIGIN:http://localhost}{uri} permanent
+}
