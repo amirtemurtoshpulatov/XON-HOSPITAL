@@ -15,8 +15,9 @@
 	}
 	respond @firstAdminOutsideSetup 403
 
-	# Google Search Console verification for the /ru/ URL-prefix property.
-	handle /ru/google0160f4bd915f0982.html {
+	# Google Search Console verification for the home and localized URL-prefix properties.
+	@googleVerification path /google0160f4bd915f0982.html /ru/google0160f4bd915f0982.html /uz/google0160f4bd915f0982.html /en/google0160f4bd915f0982.html /kk/google0160f4bd915f0982.html /tg/google0160f4bd915f0982.html
+	handle @googleVerification {
 		header Content-Type "text/html; charset=utf-8"
 		respond "google-site-verification: google0160f4bd915f0982.html" 200
 	}
