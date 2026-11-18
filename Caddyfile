@@ -15,6 +15,12 @@
 	}
 	respond @firstAdminOutsideSetup 403
 
+	# Google Search Console verification for the /ru/ URL-prefix property.
+	handle /ru/google0160f4bd915f0982.html {
+		header Content-Type "text/html; charset=utf-8"
+		respond "google-site-verification: google0160f4bd915f0982.html" 200
+	}
+
 	reverse_proxy web:3000
 }
 
