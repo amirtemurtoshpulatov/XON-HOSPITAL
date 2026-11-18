@@ -28,7 +28,7 @@ COPY . .
 # non-production secret. Neither value is copied into the runtime image.
 ENV DATABASE_URL=file:/tmp/xon-build.db
 ENV PAYLOAD_SECRET=xon-build-only-placeholder
-ARG NEXT_PUBLIC_SERVER_URL=https://xonhospital.uz
+ARG NEXT_PUBLIC_SERVER_URL=https://xon-hospital.uz
 ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL}
 
 # Next.js collects completely anonymous telemetry data about general usage.
@@ -63,6 +63,11 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# The SQLite adapter is available as a local-development fallback. Next.js'
+# output tracer cannot discover libsql's platform-selected native package, so
+# copy the Alpine Linux binary explicitly into the location Node resolves from.
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.pnpm/@libsql+linux-x64-musl@0.4.7/node_modules/@libsql/linux-x64-musl /app/node_modules/.pnpm/libsql@0.4.7/node_modules/@libsql/linux-x64-musl
 
 USER nextjs
 
