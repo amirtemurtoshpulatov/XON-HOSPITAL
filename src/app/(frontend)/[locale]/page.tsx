@@ -1,8 +1,8 @@
-import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { XonHome } from '@/components/XonHome'
-import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
+import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
+import { sectionMetadata } from '@/lib/xonSeo'
 
 export default async function LocaleHome({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -10,9 +10,6 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   return <XonHome locale={locale as SiteLocale} />
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: SiteLocale }> }): Promise<Metadata> {
-  const { locale } = await params
-  if (!localeCodes.includes(locale)) return {}
-  const copy = content[locale]
-  return { title: `${copy.heroTitle} ${copy.heroAccent}`, description: copy.heroText, alternates: { canonical: `/${locale}`, languages: Object.fromEntries(localeCodes.map((code) => [code, `/${code}`])) } }
+export function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  return sectionMetadata(params, '')
 }

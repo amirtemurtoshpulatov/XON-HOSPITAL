@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { connection } from 'next/server'
 import { ArrowDownRight, ArrowUpRight, HeartPulse, ShieldCheck, Sparkles } from 'lucide-react'
 import config from '@payload-config'
 import { getPayload } from 'payload'
@@ -13,23 +14,36 @@ import { clinicSocial, xonCopy } from '@/lib/xonCopy'
 import { serviceCopy, serviceSlugs } from '@/lib/xonServices'
 import { doctorDirectory, featuredDoctorSlugs } from '@/lib/xonDoctors'
 import { articleCopy, articleSlugs } from '@/lib/xonArticles'
+import { homeVideos } from '@/lib/xonVideoPlacements'
+import { XonVideoSection } from '@/components/XonVideo'
+import { JsonLd } from '@/components/JsonLd'
+import { listArticles } from '@/lib/clinicContent'
+import { siteOrigin } from '@/lib/xonSeo'
 import './styles.css'
 
 const defaultProgramSlugs = ['check-up', 'rehabilitation', 'salt-room', 'orthopedics']
 
 export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
+  await connection()
   const ui = xonCopy(locale)
   const fallback = content[locale]
   const prefix = `/${locale}`
   const payload = await getPayload({ config })
-  const [home, settings, services, doctors] = await Promise.all([
+  const [home, settings, services, doctors, videos, articles] = await Promise.all([
     payload.findGlobal({ slug: 'home-page', locale, fallbackLocale: false, depth: 2 }),
     payload.findGlobal({ slug: 'site-settings', locale, fallbackLocale: false, depth: 1 }),
     payload.find({ collection: 'services', locale, fallbackLocale: false, where: { featured: { equals: true } }, limit: 8, sort: 'sortOrder' }),
     payload.find({ collection: 'doctors', locale, fallbackLocale: false, limit: 100, sort: 'sortOrder', depth: 1 }),
+    homeVideos(payload, locale),
+    listArticles(locale),
   ])
 
   const phone = settings.phone || clinicSocial.phone
+  const publishedSlugs = new Set(articles.map((article) => article.slug))
+  const latestArticles = [
+    ...articles,
+    ...articleSlugs.filter((slug) => !publishedSlugs.has(slug)).map((slug) => articleCopy(locale, slug)!),
+  ].slice(0, 4)
   const t = {
     ...fallback,
     heroEyebrow: home.heroEyebrow || fallback.heroEyebrow,
@@ -58,9 +72,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
     const doctor = directory.get(slug)
     return doctor ? [doctor] : []
   }).slice(0, 6)
-  const chief = directory.get(featuredDoctorSlugs[0])
-  const heroMedia = typeof home.heroMedia === 'object' ? home.heroMedia?.url : undefined
-  const heroPhoto = heroMedia || chief?.photoUrl
+  const heroMedia = typeof home.heroMedia === 'object' ? home.heroMedia : null
   const metrics = home.metrics?.filter((item) => item.label)
   const programmes = home.programs?.filter((item) => item.title && item.text).map((item) => ({
     title: item.title,
@@ -81,6 +93,13 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
   } as CSSProperties
 
   return <main className="xon-site" lang={locale} style={style}>
+    <JsonLd data={{
+      '@type': 'MedicalClinic', name: settings.clinicName || 'XON Hospital',
+      '@id': `${siteOrigin()}/ru#clinic`, url: `${siteOrigin()}${prefix}`, telephone: phone,
+      address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressCountry: 'UZ' },
+      sameAs: [clinicSocial.instagram, clinicSocial.youtube],
+      image: `${siteOrigin()}/xon-hospital-logo.jpeg`,
+    }} />
     <XonHeader locale={locale} home />
     <section className="xon-hero-v2" id="about">
       <div className="xon-hero-main">
@@ -99,15 +118,20 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
           </dl>
           <a className="xon-hero-phone" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{ui.phone}<strong>{phone}</strong></a>
         </div>
-        {chief && <Link href={`${prefix}/doctors/${chief.slug}`} className="xon-hero-chief">
-          {heroPhoto && <Image src={heroPhoto} alt="" fill sizes="(max-width: 800px) 95vw, 42vw" preload unoptimized={Boolean(heroMedia || !heroPhoto.startsWith('/doctors/'))} />}
-          <div><span>{chief.position}</span><strong>{chief.name}</strong><ArrowUpRight size={22} /></div>
-        </Link>}
+        <div className="xon-hero-clinic">
+          <Link className={`xon-clinic-visual${heroMedia?.url ? ' has-photo' : ''}`} href={`${prefix}/about`} aria-label={t.nav[2]}>
+            {heroMedia?.url
+              ? <Image src={heroMedia.url} alt={heroMedia.alt || ''} fill sizes="(max-width: 760px) 94vw, 42vw" preload unoptimized />
+              : <Image src="/xon-hospital-logo.jpeg" alt="" width={176} height={176} preload />}
+            <span className="xon-clinic-caption">{t.nav[2]}<ArrowUpRight size={18} aria-hidden="true" /></span>
+          </Link>
+          <nav className="xon-hero-shortcuts" aria-label={ui.navigation}>
+            {shortcuts.map(({ href, label, Icon }) => <Link key={href} href={`${prefix}${href}`}><Icon size={19} aria-hidden="true" /><span>{label}</span><ArrowUpRight size={15} aria-hidden="true" /></Link>)}
+          </nav>
+        </div>
       </div>
-      <nav className="xon-hero-shortcuts" aria-label={ui.navigation}>
-        {shortcuts.map(({ href, label, Icon }) => <Link key={href} href={`${prefix}${href}`}><Icon size={22} /><span>{label}</span><ArrowUpRight size={16} /></Link>)}
-      </nav>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:hero')} />
 
     <section className="xon-programs">
       <div className="xon-programs-head"><p className="xon-label">{home.programsEyebrow || ui.programs}</p><h2>{home.programsTitle || ui.programsTitle}</h2><p>{home.programsText || ui.programsText}</p></div>
@@ -115,6 +139,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
         {programmeCards.map((item, index) => <Link href={`${prefix}/services${item.slug ? `/${item.slug}` : ''}`} key={`${item.title}-${index}`}><h3>{item.title}</h3><p>{item.text}</p><b>{ui.more} ↗</b></Link>)}
       </div>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:programs')} />
 
     <section className="xon-services" id="services">
       <div className="xon-section-head"><p className="xon-label">{t.servicesLabel}</p><h2>{t.servicesTitle}</h2><p>{t.servicesText}</p></div>
@@ -124,11 +149,13 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
         ))}
       </div>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:services')} />
 
     <section className="xon-path" id="prices">
       <div className="xon-path-intro"><p className="xon-label light">{t.pathLabel}</p><h2>{t.pathTitle}</h2></div>
       <ol className="xon-path-steps">{t.pathSteps.map((step, index) => <li key={step.title}><span>0{index + 1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:path')} />
 
     <section className="xon-team-section" id="doctors">
       <div className="xon-programs-head"><p className="xon-label">{t.doctorsLabel}</p><h2>{t.doctorsTitle}</h2><p>{t.doctorsText}</p><Link href={`${prefix}/doctors`} className="xon-text-link dark">{ui.chooseDoctor}<ArrowUpRight size={17} /></Link></div>
@@ -139,19 +166,21 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
         </Link>)}
       </div>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:doctors')} />
 
     <section className="xon-affordability">
       <div className="xon-coin" aria-hidden="true"><span>X</span></div><div><h2>{t.affordabilityTitle}</h2><p>{t.affordabilityText}</p></div><a href="#appointment" aria-label={t.primaryAction}><ArrowDownRight /></a>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:prices')} />
 
     <section className="xon-programs xon-journal">
       <div className="xon-programs-head"><h2>{ui.journal}</h2><Link className="xon-text-link dark" href={`${prefix}/articles`}>{ui.more}<ArrowUpRight size={16} /></Link></div>
-      <div className="xon-guide-links">{articleSlugs.map((slug) => {
-        const article = articleCopy(locale, slug)!
-        return <Link href={`${prefix}/articles/${slug}`} key={slug}><h3>{article.title}</h3><p>{article.description}</p><ArrowUpRight size={19} /></Link>
-      })}</div>
+      <div className="xon-guide-links">{latestArticles.map((article) =>
+        <Link href={`${prefix}/articles/${article.slug}`} key={article.slug}><h3>{article.title}</h3><p>{article.description}</p><ArrowUpRight size={19} /></Link>
+      )}</div>
       <div className="xon-social-links"><span>{ui.officialMedia}</span><a href={clinicSocial.youtube} target="_blank" rel="noreferrer">YouTube ↗</a><a href={clinicSocial.instagram} target="_blank" rel="noreferrer">Instagram ↗</a></div>
     </section>
+    <XonVideoSection locale={locale} items={videos('home:articles')} />
 
     <section className="xon-appointment" id="appointment">
       <div className="xon-appointment-copy"><p className="xon-label light">{t.nav[4]}</p><h2>{t.formTitle}</h2><p>{t.formText}</p>
@@ -159,6 +188,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
       </div>
       <LeadForm locale={locale} labels={t} />
     </section>
+    <XonVideoSection locale={locale} items={videos('home:appointment')} />
     <XonFooter locale={locale} settings={settings} />
   </main>
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { connection } from 'next/server'
 import type { ReactNode, CSSProperties } from 'react'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -7,6 +8,8 @@ import { ArrowUpRight } from 'lucide-react'
 import { content, type SiteLocale } from '@/components/XonHome/content'
 import { XonHeader } from '@/components/XonHeader'
 import { XonFooter } from '@/components/XonFooter'
+import { XonVideoSection } from '@/components/XonVideo'
+import { interiorVideos, type InteriorVideoSection } from '@/lib/xonVideoPlacements'
 import '@/components/XonHome/styles.css'
 import './styles.css'
 
@@ -16,6 +19,10 @@ export async function XonInterior({
   title,
   intro,
   index = '01',
+  videoSection,
+  appointmentHref,
+  translatedLocales,
+  untranslatedPath,
   children,
 }: {
   locale: SiteLocale
@@ -23,10 +30,18 @@ export async function XonInterior({
   title: string
   intro?: string
   index?: string
+  videoSection: InteriorVideoSection
+  appointmentHref?: string
+  translatedLocales?: readonly SiteLocale[]
+  untranslatedPath?: string
   children: ReactNode
 }) {
+  await connection()
   const payload = await getPayload({ config: configPromise })
-  const settings = await payload.findGlobal({ slug: 'site-settings', locale, fallbackLocale: false })
+  const [settings, videos] = await Promise.all([
+    payload.findGlobal({ slug: 'site-settings', locale, fallbackLocale: false }),
+    interiorVideos(payload, locale, videoSection),
+  ])
   const t = content[locale]
   const prefix = `/${locale}`
   const palette = settings.palette
@@ -39,7 +54,7 @@ export async function XonInterior({
 
   return (
     <main className="xon-site xon-interior" lang={locale} style={paletteStyle}>
-      <XonHeader locale={locale} />
+      <XonHeader locale={locale} translatedLocales={translatedLocales} untranslatedPath={untranslatedPath} />
 
       <section className="xon-page-hero">
         <div className="xon-page-grid" aria-hidden="true" />
@@ -49,10 +64,13 @@ export async function XonInterior({
       </section>
 
       {children}
+      <XonVideoSection locale={locale} items={videos} />
 
       <section className="xon-page-cta">
         <p>{t.formText}</p>
-        <Link href={`${prefix}/contacts#appointment`}>{t.primaryAction}<ArrowUpRight /></Link>
+        <Link className="xon-primary xon-page-cta-button" href={appointmentHref || `${prefix}/contacts#appointment`}>
+          <span>{t.primaryAction}</span><ArrowUpRight size={18} aria-hidden="true" />
+        </Link>
       </section>
       <XonFooter locale={locale} settings={settings} />
     </main>

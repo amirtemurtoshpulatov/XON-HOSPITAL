@@ -3,6 +3,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { doctorProfile } from '@/lib/xonDoctors'
 import { localeCodes } from '@/components/XonHome/content'
+import { seedPreventionArticles } from './preventionArticles'
 
 const doctors = [
   {
@@ -230,6 +231,7 @@ async function main() {
   }
 
   if (skipBaseSeed) {
+    await seedPreventionArticles(payload)
     payload.logger.info('Clinic seed skipped: database already contains clinic content')
     return
   }
@@ -272,6 +274,7 @@ async function main() {
     else await payload.create({ collection: 'services', locale: 'ru', data })
   }
 
+  await seedPreventionArticles(payload)
   payload.logger.info(`Clinic seed complete: ${doctors.length} doctors, ${services.length} services`)
 }
 

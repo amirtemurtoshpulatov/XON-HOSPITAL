@@ -14,6 +14,9 @@ import { Doctors } from './collections/Doctors'
 import { Leads } from './collections/Leads'
 import { Prices } from './collections/Prices'
 import { Services } from './collections/Services'
+import { VideoFiles } from './collections/VideoFiles'
+import { VideoPlacements } from './collections/VideoPlacements'
+import { ClinicArticles } from './collections/ClinicArticles'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -86,7 +89,7 @@ export default buildConfig({
     defaultLocale: 'ru',
     fallback: true,
   },
-  collections: [Pages, Doctors, Services, Prices, Leads, Posts, Media, Categories, Users],
+  collections: [Pages, Doctors, Services, Prices, Leads, ClinicArticles, Posts, Media, VideoFiles, VideoPlacements, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [HomePage, SiteSettings, Header, Footer],
   plugins,

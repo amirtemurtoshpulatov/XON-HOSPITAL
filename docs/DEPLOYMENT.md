@@ -44,6 +44,28 @@ docker compose up --build
 
 Контейнер поднимает приложение и PostgreSQL. Пароль в `docker-compose.yml` предназначен только для локального запуска; в production задайте отдельные секреты у хостинга.
 
+## VPS / Fornex
+
+Боевой сервер использует `compose.production.yml`: приложение, PostgreSQL и Caddy с автоматическим HTTPS.
+
+1. Скопируйте `.env.production.example` в `.env.production` и замените все секреты.
+2. Пока DNS не подключён, задайте `SITE_ADDRESS=http://SERVER_IP` и тот же адрес в `NEXT_PUBLIC_SERVER_URL`.
+3. После подключения DNS установите `SITE_ADDRESS=xonhospital.uz, www.xonhospital.uz` и `NEXT_PUBLIC_SERVER_URL=https://xonhospital.uz`.
+4. Запустите:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yml up -d --build
+```
+
+Проверка состояния и журналов:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yml ps
+docker compose --env-file .env.production -f compose.production.yml logs --tail=200 web
+```
+
+Каталоги PostgreSQL, медиа и сертификаты Caddy хранятся в именованных Docker volumes и не удаляются при обновлении контейнеров.
+
 ## Без Docker
 
 ```bash

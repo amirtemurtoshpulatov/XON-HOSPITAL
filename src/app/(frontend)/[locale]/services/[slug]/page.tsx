@@ -1,5 +1,3 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import Link from 'next/link'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { notFound } from 'next/navigation'
@@ -13,14 +11,34 @@ import { serviceCopy } from '@/lib/xonServices'
 import { doctorProfile } from '@/lib/xonDoctors'
 import { xonCopy } from '@/lib/xonCopy'
 import { articleCopy, visitGuideSlug } from '@/lib/xonArticles'
+import { findService, serviceLocales } from '@/lib/clinicContent'
+import { pageSEO } from '@/lib/xonSeo'
 
-export default async function ServiceDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+type Props = { params: Promise<{ locale: string; slug: string }> }
+
+export async function generateMetadata({ params }: Props) {
+  const { locale: rawLocale, slug } = await params
+  if (!localeCodes.includes(rawLocale as SiteLocale)) return {}
+  const locale = rawLocale as SiteLocale
+  const service = await findService(locale, slug)
+  const fallback = serviceCopy(locale, slug)
+  const title = service?.title || fallback?.title
+  if (!title) return {}
+  const cover = typeof service?.cover === 'object' ? service.cover : null
+  return pageSEO(locale, `/services/${slug}`, {
+    title,
+    description: service?.summary || fallback?.text,
+    image: cover?.url,
+    imageAlt: cover?.alt ?? undefined,
+    locales: await serviceLocales(slug),
+  })
+}
+
+export default async function ServiceDetailPage({ params }: Props) {
   const { locale: rawLocale, slug } = await params
   if (!localeCodes.includes(rawLocale as SiteLocale)) notFound()
   const locale = rawLocale as SiteLocale
-  const payload = await getPayload({ config: configPromise })
-  const result = await payload.find({ collection: 'services', locale, fallbackLocale: false, where: { slug: { equals: slug } }, limit: 1, depth: 2 })
-  const service = result.docs[0]
+  const service = await findService(locale, slug)
   const fallback = serviceCopy(locale, slug)
   const title = service?.title || fallback?.title
   if (!title) notFound()
@@ -43,7 +61,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const prices = service?.prices || []
   const faq = service?.faq || []
 
-  return <XonInterior locale={locale} eyebrow={service?.eyebrow || ui.info} title={title} intro={summary} index="01">
+  return <XonInterior locale={locale} videoSection={`services/${slug}`} eyebrow={service?.eyebrow || ui.info} title={title} intro={summary} index="01">
     {facts.length > 0 && <section className="xon-service-facts" aria-label={ui.facts}>{facts.map((fact) => <div key={fact.id || `${fact.label}-${fact.value}`}><small>{fact.label}</small><strong>{fact.value}</strong></div>)}</section>}
     <section className={`xon-page-content xon-detail${cover ? '' : ' xon-detail-no-photo'}`}>
       {cover && <div className="xon-detail-media" style={{ backgroundImage: `url(${cover})` }} />}

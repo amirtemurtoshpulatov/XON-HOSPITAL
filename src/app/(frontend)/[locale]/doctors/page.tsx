@@ -10,6 +10,12 @@ import { interiorCopy } from '@/components/XonInterior/copy'
 import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 import { doctorDirectory } from '@/lib/xonDoctors'
 
+import { sectionMetadata } from '@/lib/xonSeo'
+
+export function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  return sectionMetadata(params, '/doctors')
+}
+
 export default async function DoctorsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params
   if (!localeCodes.includes(rawLocale as SiteLocale)) notFound()
@@ -19,7 +25,7 @@ export default async function DoctorsPage({ params }: { params: Promise<{ locale
   const doctors = doctorDirectory(locale, result.docs)
   const copy = interiorCopy[locale].doctors
 
-  return <XonInterior locale={locale} eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="02">
+  return <XonInterior locale={locale} videoSection="doctors" eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="02">
     <section className="xon-page-content">
       <div className="xon-team-portraits">{doctors.map((doctor) =>
         <Link key={doctor.slug} className="xon-portrait-card" href={`/${locale}/doctors/${doctor.slug}`}>

@@ -12,7 +12,7 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
-import { getServerSideURL } from '@/utilities/getURL'
+import { indexableSite, siteOrigin } from '@/lib/xonSeo'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
@@ -40,7 +40,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getServerSideURL()),
+  metadataBase: new URL(siteOrigin()),
+  robots: { index: indexableSite(), follow: true },
   title: {
     default: 'XON HOSPITAL — многопрофильная клиника',
     template: '%s | XON HOSPITAL',

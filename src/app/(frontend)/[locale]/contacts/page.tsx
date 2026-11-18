@@ -8,6 +8,12 @@ import { LeadForm } from '@/components/XonHome/LeadForm'
 import { xonCopy, clinicSocial } from '@/lib/xonCopy'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
 
+import { sectionMetadata } from '@/lib/xonSeo'
+
+export function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  return sectionMetadata(params, '/contacts')
+}
+
 export default async function ContactsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params
   if (!localeCodes.includes(rawLocale as SiteLocale)) notFound()
@@ -19,7 +25,7 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
   const ui = xonCopy(locale)
   const phone = settings.phone || clinicSocial.phone
 
-  return <XonInterior locale={locale} eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="05">
+  return <XonInterior locale={locale} videoSection="contacts" appointmentHref="#appointment" eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="05">
     <section className="xon-page-content xon-contacts-grid" id="appointment">
       <div className="xon-contact-lines">
         <div className="xon-contact-line"><small>{ui.phone}</small><a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a></div>

@@ -23,6 +23,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Payload initializes while Next.js builds. Production data is loaded at
+# request time, so the build uses an isolated throwaway SQLite database and a
+# non-production secret. Neither value is copied into the runtime image.
+ENV DATABASE_URL=file:/tmp/xon-build.db
+ENV PAYLOAD_SECRET=xon-build-only-placeholder
+ARG NEXT_PUBLIC_SERVER_URL=https://xonhospital.uz
+ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL}
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
@@ -43,6 +51,9 @@ RUN adduser --system --uid 1001 nextjs
 
 # Remove this line if you do not have this folder
 COPY --from=builder /app/public ./public
+
+# Payload writes uploaded images to this persistent mount at runtime.
+RUN mkdir -p /app/public/media && chown -R nextjs:nodejs /app/public/media
 
 # Set the correct permission for prerender cache
 RUN mkdir .next

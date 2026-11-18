@@ -15,7 +15,11 @@ export const clinicSocial = {
 const labels = {
   navigation: ['Навигация', 'Menyu', 'Navigation', 'Мәзір', 'Меню'],
   language: ['Выбрать язык', 'Tilni tanlash', 'Select language', 'Тілді таңдау', 'Интихоби забон'],
-  journal: ['Пациентам', 'Bemorlar uchun', 'Patient guides', 'Пациенттерге', 'Барои беморон'],
+  journal: ['Статьи для пациентов', 'Bemorlar uchun maqolalar', 'Patient articles', 'Пациенттерге арналған мақалалар', 'Мақолаҳо барои беморон'],
+  journalNav: ['Статьи', 'Maqolalar', 'Articles', 'Мақалалар', 'Мақолаҳо'],
+  journalIntro: ['Материалы о профилактике, обследованиях и подготовке к приёму в XON Hospital.', 'XON Hospital’dan profilaktika, tekshiruv va qabulga tayyorgarlik haqida maqolalar.', 'Guides to prevention, health checks and preparing for a visit to XON Hospital.', 'XON Hospital-дың алдын алу, тексерулер және қабылдауға дайындық туралы мақалалары.', 'Мақолаҳои XON Hospital дар бораи пешгирӣ, ташхис ва омодагӣ ба қабул.'],
+  articleAuthor: ['Автор', 'Muallif', 'Author', 'Автор', 'Муаллиф'],
+  articleReviewer: ['Материал проверил', 'Materialni tekshirgan', 'Reviewed by', 'Материалды тексерген', 'Маводро санҷид'],
   more: ['Подробнее', 'Batafsil', 'Learn more', 'Толығырақ', 'Муфассал'],
   city: ['Ташкент, Узбекистан', 'Toshkent, O‘zbekiston', 'Tashkent, Uzbekistan', 'Ташкент, Өзбекстан', 'Тошканд, Ӯзбекистон'],
   chooseDoctor: ['Выбрать врача', 'Shifokorni tanlash', 'Find a doctor', 'Дәрігерді таңдау', 'Интихоби табиб'],
@@ -49,6 +53,7 @@ const labels = {
   videoTitle: ['Видеовизитка', 'Video tanishtiruv', 'Video introduction', 'Бейнетаныстырылым', 'Муаррифии видеоӣ'],
   visit: ['Как подготовиться к приёму', 'Qabulga qanday tayyorlanish kerak', 'How to prepare for your visit', 'Қабылдауға қалай дайындалуға болады', 'Ба қабул чӣ гуна омода шудан лозим аст'],
   source: ['Источник', 'Manba', 'Source', 'Дереккөз', 'Манбаъ'],
+  sources: ['Источники', 'Manbalar', 'Sources', 'Дереккөздер', 'Манбаъҳо'],
   officialMedia: ['Видео и новости клиники', 'Klinika videolari va yangiliklari', 'Clinic videos and news', 'Клиника бейнелері мен жаңалықтары', 'Наворҳо ва навигариҳои клиника'],
 } satisfies Record<string, Translations>
 

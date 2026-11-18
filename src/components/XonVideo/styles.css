@@ -1,0 +1,12 @@
+.xon-video-section { padding: clamp(36px, 5vw, 74px) clamp(20px, 7vw, 120px); background: var(--xon-ivory); border-top: 1px solid var(--xon-line); color: var(--xon-green); }
+.xon-video-section h2 { font-size: clamp(26px, 3vw, 42px); line-height: 1.13; margin-bottom: 20px; }
+.xon-video-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; align-items: start; }
+.xon-video-card { width: 100%; max-width: 680px; padding: clamp(14px, 2vw, 22px); border: 1px solid var(--xon-line); border-radius: 8px; color: var(--xon-green); background: #fff; }
+.xon-video-card.is-portrait { max-width: 380px; }
+.xon-video-card h3 { font-size: clamp(17px, 2vw, 22px); line-height: 1.24; overflow-wrap: anywhere; }
+.xon-video-card p { margin-top: 8px; font-size: 14px; line-height: 1.5; color: #465967; }
+.xon-player { margin-top: 14px; aspect-ratio: 16 / 9; background: #142632; overflow: hidden; border-radius: 4px; }
+.xon-video-card.is-portrait .xon-player { aspect-ratio: 9 / 16; }
+.xon-player > * { display: block; width: 100%; height: 100%; border: 0; }
+.xon-video-links { display: flex; gap: 12px 20px; flex-wrap: wrap; margin-top: 14px; }
+.xon-video-links a { color: var(--xon-green); text-decoration: underline; text-underline-offset: 4px; font-size: 13px; }

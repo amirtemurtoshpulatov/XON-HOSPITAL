@@ -10,6 +10,12 @@ import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 
 import { serviceCopy, serviceSlugs } from '@/lib/xonServices'
 
+import { sectionMetadata } from '@/lib/xonSeo'
+
+export function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  return sectionMetadata(params, '/services')
+}
+
 export default async function ServicesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params
   if (!localeCodes.includes(rawLocale as SiteLocale)) notFound()
@@ -26,7 +32,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   })
   const copy = interiorCopy[locale].services
 
-  return <XonInterior locale={locale} eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="01">
+  return <XonInterior locale={locale} videoSection="services" eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro} index="01">
     <section className="xon-page-content">
       <div className="xon-filter-note"><span>01 — {String(services.length).padStart(2, '0')}</span><span>XON HOSPITAL</span></div>
       <div className="xon-list-grid">{services.map((service) => <Link className="xon-list-card" key={service.slug} href={`/${locale}/services/${service.slug}`}><span>{service.number}</span><h2>{service.title}</h2><p>{service.text}</p><ArrowUpRight /></Link>)}</div>

@@ -56,11 +56,11 @@ body { background:var(--xon-ivory); }
 }
 .xon-mobile-nav nav a { display: block; padding: 13px 0; border-bottom: 1px solid var(--xon-line); }
 
-.xon-hero-v2 { padding: clamp(24px, 3vw, 48px) clamp(20px, 5vw, 88px) 0; }
-.xon-hero-main { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(25px, 5vw, 88px); align-items: stretch; }
+.xon-hero-v2 { padding: clamp(30px, 4vw, 64px) clamp(20px, 5vw, 88px); }
+.xon-hero-main { display: grid; grid-template-columns: minmax(0, 1.23fr) minmax(0, 1fr); gap: clamp(25px, 5vw, 88px); align-items: center; }
 .xon-hero-intro { align-self: center; padding: clamp(10px, 1.7vw, 24px) 0; min-width: 0; }
 .xon-hero-intro h1 {
-  font-size: clamp(38px, 5.15vw, 88px);
+  font-size: clamp(38px, 4.8vw, 80px);
   color: var(--xon-green);
   font-weight: 600;
   line-height: 1.02;
@@ -84,29 +84,29 @@ body { background:var(--xon-ivory); }
 .xon-hero-phone { display: inline-flex; align-items: baseline; gap: 9px; margin-top: 16px; color: #465967; font-size: 13px; }
 .xon-hero-phone strong { color: var(--xon-green); text-decoration: underline; text-underline-offset: 3px; }
 .xon-hero-metrics dd { font-size: 33px; line-height: 1.1; font-weight: 630; color: var(--xon-green); }
-.xon-hero-chief {
-  display: flex;
+.xon-hero-clinic { min-width: 0; border: 1px solid var(--xon-line); border-radius: 12px; background: white; overflow: hidden; }
+.xon-hero-clinic:focus-within { outline: 1px solid var(--xon-gold); outline-offset: 2px; }
+.xon-clinic-visual {
+  display: grid;
+  place-items: center;
   position: relative;
-  align-items: flex-end;
-  min-height: clamp(330px, 40vw, 570px);
   isolation: isolate;
+  min-height: 228px;
+  aspect-ratio: 1.78;
   overflow: hidden;
-  color: white;
-  border-radius: 12px;
-  background: #e8e1d4;
+  background: radial-gradient(ellipse at 50% 34%, #fff 12%, color-mix(in srgb, var(--xon-gold) 12%, var(--xon-ivory)) 100%);
 }
-.xon-hero-chief img { object-fit: cover; object-position: center 32%; transition: transform .45s ease; }
-.xon-hero-chief:hover img { transform: scale(1.035); }
-.xon-hero-chief::after { content: ""; position: absolute; inset: 48% 0 0; background: linear-gradient(transparent, #102a3df5); pointer-events: none; }
-.xon-hero-chief > div { width: 100%; position: relative; z-index: 1; padding: 26px 58px 26px 24px; display: grid; gap: 4px; }
-.xon-hero-chief strong { font-size: clamp(20px, 2vw, 32px); line-height: 1.16; }
-.xon-hero-chief span { color: #fff2d8; font-size: 13px; }
-.xon-hero-chief svg { position: absolute; right: 25px; bottom: 27px; }
+.xon-clinic-visual:not(.has-photo)::before { content: ""; position: absolute; inset: 15px; z-index: -1; border: 1px solid color-mix(in srgb, var(--xon-gold) 31%, transparent); border-radius: 6px; }
+.xon-clinic-visual:not(.has-photo) img { width: clamp(112px, 12vw, 176px); height: auto; margin-bottom: 24px; mix-blend-mode: multiply; }
+.xon-clinic-visual.has-photo img { object-fit: cover; object-position: center; }
+.xon-clinic-caption { position: absolute; bottom: 24px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--xon-green); font-size: 13px; font-weight: 650; }
+.xon-clinic-visual.has-photo .xon-clinic-caption { background: var(--xon-ivory); right: auto; bottom: 16px; left: 16px; padding: 10px 13px; border-radius: 4px; }
+.xon-clinic-visual:hover .xon-clinic-caption { text-decoration: underline; text-underline-offset: 4px; }
 .xon-hero-shortcuts {
-  display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 19px; border: 1px solid var(--xon-line); background: #fff;
+  display: grid; border-top: 1px solid var(--xon-line);
 }
-.xon-hero-shortcuts a { min-width: 0; display: flex; align-items: center; gap: 15px; padding: 17px 20px; color: var(--xon-green); font-weight: 600; line-height: 1.15; }
-.xon-hero-shortcuts a + a { border-left: 1px solid var(--xon-line); }
+.xon-hero-shortcuts a { min-width: 0; display: flex; align-items: center; gap: 13px; padding: 12px 20px; color: var(--xon-green); font-size: 14px; font-weight: 600; line-height: 1.25; }
+.xon-hero-shortcuts a + a { border-top: 1px solid var(--xon-line); }
 .xon-hero-shortcuts a:hover { background: var(--xon-ivory); }
 .xon-hero-shortcuts svg { flex: none; }
 .xon-hero-shortcuts svg:last-child { margin-left: auto; }
@@ -140,17 +140,10 @@ body { background:var(--xon-ivory); }
   .xon-team-portraits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .xon-team-section .xon-programs-head { grid-template-columns: 1fr; gap: 16px; }
 }
-@media (max-width: 650px) {
+@media (max-width: 760px) {
   .xon-hero-main { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .xon-hero-intro h1 { margin-top: 12px; }
-  .xon-hero-chief { min-height: clamp(280px, 78vw, 430px); }
-  .xon-hero-chief img { object-position: center top; }
+  .xon-clinic-visual { min-height: 168px; aspect-ratio: 2.18; }
   .xon-hero-metrics { margin-top: 22px; padding-top: 12px; }
-  .xon-hero-shortcuts { grid-template-columns: 1fr; }
-  .xon-hero-shortcuts a + a { border-left: 0; border-top: 1px solid var(--xon-line); }
   .xon-guide-links { grid-template-columns: 1fr; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .xon-hero-chief img { transition: none; }
-  .xon-hero-chief:hover img { transform: none; }
 }

@@ -4,7 +4,7 @@ const seededDoctorPhotos: Record<string, string> = {
   'asilbek-sharofov': '/doctors/asilbek-sharofov.webp',
   'fayzullo-narzullayevich': '/doctors/fayzullo-narzullayevich.webp',
   'ruslan-alisherovich': '/doctors/ruslan-alisherovich.jpg',
-  'vohid-latipov': '/doctors/vohid-latipov.jpg',
+  'vohid-latipov': '/doctors/vohid-latipov.webp',
 }
 
 export function getSeededDoctorPhoto(slug?: string | null) {

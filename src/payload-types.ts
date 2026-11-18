@@ -72,8 +72,11 @@ export interface Config {
     services: Service;
     prices: Price;
     leads: Lead;
+    'clinic-articles': ClinicArticle;
     posts: Post;
     media: Media;
+    'video-files': VideoFile;
+    'video-placements': VideoPlacement;
     categories: Category;
     users: User;
     redirects: Redirect;
@@ -98,8 +101,11 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     prices: PricesSelect<false> | PricesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    'clinic-articles': ClinicArticlesSelect<false> | ClinicArticlesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'video-files': VideoFilesSelect<false> | VideoFilesSelect<true>;
+    'video-placements': VideoPlacementsSelect<false> | VideoPlacementsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -826,6 +832,22 @@ export interface Doctor {
   videoUrl?: string | null;
   videoTitle?: string | null;
   videoPoster?: (number | null) | Media;
+  videoLibrary?:
+    | {
+        title: string;
+        description?: string | null;
+        /**
+         * Скопируйте ссылку на публичный Reels, YouTube (включая Shorts) или Vimeo. Если загружаете файл, оставьте поле пустым.
+         */
+        url?: string | null;
+        file?: (number | null) | VideoFile;
+        /**
+         * Reels и Shorts распознаются автоматически. Для загруженного вертикального файла выберите 9:16.
+         */
+        format?: ('auto' | 'portrait' | 'landscape') | null;
+        id?: string | null;
+      }[]
+    | null;
   videos?:
     | {
         title: string;
@@ -889,6 +911,25 @@ export interface Doctor {
   sortOrder?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Файлы MP4 или WebM до 16 МБ. Для более длинных роликов вставьте ссылку на YouTube, Instagram или Vimeo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "video-files".
+ */
+export interface VideoFile {
+  id: number;
+  contents?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1006,6 +1047,91 @@ export interface Lead {
   utmCampaign?: string | null;
   sheetSync?: ('pending' | 'synced' | 'failed') | null;
   consent: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clinic-articles".
+ */
+export interface ClinicArticle {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  cover?: (number | null) | Media;
+  authorName?: string | null;
+  /**
+   * Укажите имя только после проверки материала специалистом.
+   */
+  reviewerName?: string | null;
+  sources?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  relatedService?: (number | null) | Service;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "video-placements".
+ */
+export interface VideoPlacement {
+  id: number;
+  section:
+    | 'home:hero'
+    | 'home:programs'
+    | 'home:services'
+    | 'home:path'
+    | 'home:doctors'
+    | 'home:prices'
+    | 'home:articles'
+    | 'home:appointment'
+    | 'services'
+    | 'doctors'
+    | 'about'
+    | 'prices'
+    | 'contacts'
+    | 'articles'
+    | 'detail';
+  /**
+   * Без домена и языка. Например: doctors/vohid-latipov или services/check-up.
+   */
+  pagePath?: string | null;
+  title: string;
+  description?: string | null;
+  /**
+   * Скопируйте ссылку на публичный Reels, YouTube (включая Shorts) или Vimeo. Если загружаете файл, оставьте поле пустым.
+   */
+  url?: string | null;
+  file?: (number | null) | VideoFile;
+  /**
+   * Reels и Shorts распознаются автоматически. Для загруженного вертикального файла выберите 9:16.
+   */
+  format?: ('auto' | 'portrait' | 'landscape') | null;
+  sortOrder?: number | null;
+  visible?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1220,12 +1346,24 @@ export interface PayloadLockedDocument {
         value: number | Lead;
       } | null)
     | ({
+        relationTo: 'clinic-articles';
+        value: number | ClinicArticle;
+      } | null)
+    | ({
         relationTo: 'posts';
         value: number | Post;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'video-files';
+        value: number | VideoFile;
+      } | null)
+    | ({
+        relationTo: 'video-placements';
+        value: number | VideoPlacement;
       } | null)
     | ({
         relationTo: 'categories';
@@ -1467,6 +1605,16 @@ export interface DoctorsSelect<T extends boolean = true> {
   videoUrl?: T;
   videoTitle?: T;
   videoPoster?: T;
+  videoLibrary?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        url?: T;
+        file?: T;
+        format?: T;
+        id?: T;
+      };
   videos?:
     | T
     | {
@@ -1621,6 +1769,31 @@ export interface LeadsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clinic-articles_select".
+ */
+export interface ClinicArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  cover?: T;
+  authorName?: T;
+  reviewerName?: T;
+  sources?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  relatedService?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -1743,6 +1916,39 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "video-files_select".
+ */
+export interface VideoFilesSelect<T extends boolean = true> {
+  contents?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "video-placements_select".
+ */
+export interface VideoPlacementsSelect<T extends boolean = true> {
+  section?: T;
+  pagePath?: T;
+  title?: T;
+  description?: T;
+  url?: T;
+  file?: T;
+  format?: T;
+  sortOrder?: T;
+  visible?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2073,6 +2279,9 @@ export interface HomePage {
   heroTitle?: string | null;
   heroAccent?: string | null;
   heroText?: string | null;
+  /**
+   * Лучше всего подойдёт горизонтальный снимок фасада или интерьера. Без фото показывается фирменная карточка XON Hospital.
+   */
   heroMedia?: (number | null) | Media;
   servicesTitle?: string | null;
   servicesText?: string | null;

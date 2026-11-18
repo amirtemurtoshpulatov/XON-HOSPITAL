@@ -18,7 +18,7 @@ export const HomePage: GlobalConfig = {
             { name: 'heroTitle', label: 'Главный заголовок', type: 'text', localized: true },
             { name: 'heroAccent', label: 'Акцентная строка', type: 'text', localized: true },
             { name: 'heroText', label: 'Описание', type: 'textarea', localized: true },
-            { name: 'heroMedia', label: 'Изображение в анимации', type: 'upload', relationTo: 'media' },
+            { name: 'heroMedia', label: 'Фото клиники для первого экрана', type: 'upload', relationTo: 'media', admin: { description: 'Лучше всего подойдёт горизонтальный снимок фасада или интерьера. Без фото показывается фирменная карточка XON Hospital.' } },
           ],
         },
         {
