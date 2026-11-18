@@ -13,6 +13,7 @@ import { draftMode, headers } from 'next/headers'
 
 import './globals.css'
 import { indexableSite, siteOrigin } from '@/lib/xonSeo'
+import { xonIcons } from '@/lib/xonBrand'
 import { localeCodes } from '@/components/XonHome/content'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -47,10 +48,7 @@ export const metadata: Metadata = {
     template: '%s | XON HOSPITAL',
   },
   description: 'Диагностика, лечение и реабилитация в многопрофильной клинике XON HOSPITAL.',
-  icons: {
-    icon: [{ url: '/xon-favicon.png', sizes: '96x96', type: 'image/png' }],
-    apple: [{ url: '/xon-apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-  },
+  icons: xonIcons,
   openGraph: mergeOpenGraph({
     images: [{ url: '/xon-hospital-logo.jpeg', width: 720, height: 720, alt: 'XON HOSPITAL' }],
   }),

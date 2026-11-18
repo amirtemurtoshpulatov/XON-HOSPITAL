@@ -21,6 +21,7 @@ import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
+import { xonIcons } from '@/lib/xonBrand'
 import { getServerSideURL } from './utilities/getURL'
 import { SiteSettings } from './globals/SiteSettings'
 import { HomePage } from './globals/HomePage'
@@ -40,12 +41,18 @@ const databaseAdapter = databaseURL.startsWith('postgres')
 
 export default buildConfig({
   admin: {
+    meta: {
+      titleSuffix: ' | XON Hospital CMS',
+      description: 'Панель управления сайтом XON Hospital.',
+      robots: { index: false, follow: false },
+      icons: xonIcons,
+    },
     components: {
-      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
+      graphics: {
+        Logo: '@/components/XonAdminBrand#XonAdminLogo',
+        Icon: '@/components/XonAdminBrand#XonAdminIcon',
+      },
       beforeLogin: ['@/components/BeforeLogin'],
-      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
       beforeDashboard: ['@/components/BeforeDashboard'],
     },
     importMap: {

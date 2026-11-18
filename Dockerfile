@@ -51,7 +51,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Remove this line if you do not have this folder
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Payload writes uploaded images to this persistent mount at runtime.
 RUN mkdir -p /app/public/media && chown -R nextjs:nodejs /app/public/media
