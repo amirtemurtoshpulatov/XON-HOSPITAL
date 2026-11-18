@@ -8,6 +8,13 @@
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 	}
 
+	# Limit first-account registration while the user table is empty.
+	@firstAdminOutsideSetup {
+		path /api/users/first-register /api/users/first-register/ /admin/create-first-user /admin/create-first-user/
+		not remote_ip {$ADMIN_SETUP_IP:127.0.0.1}
+	}
+	respond @firstAdminOutsideSetup 403
+
 	reverse_proxy web:3000
 }
 

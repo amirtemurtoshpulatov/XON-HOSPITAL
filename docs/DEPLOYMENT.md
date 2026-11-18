@@ -50,7 +50,7 @@ docker compose up --build
 
 1. Скопируйте `.env.production.example` в `.env.production` и замените все секреты.
 2. Пока DNS не подключён, задайте `SITE_ADDRESS=http://SERVER_IP` и тот же адрес в `NEXT_PUBLIC_SERVER_URL`.
-3. После подключения DNS установите `SITE_ADDRESS=xonhospital.uz, www.xonhospital.uz` и `NEXT_PUBLIC_SERVER_URL=https://xonhospital.uz`.
+3. После подключения DNS установите `SITE_ADDRESS=xon-hospital.uz`, `WWW_SITE_ADDRESS=www.xon-hospital.uz` и `https://xon-hospital.uz` в `CANONICAL_ORIGIN`, `NEXT_PUBLIC_SERVER_URL` и `SITE_CANONICAL_URL`.
 4. Запустите:
 
 ```bash
@@ -66,6 +66,12 @@ docker compose --env-file .env.production -f compose.production.yml logs --tail=
 
 Каталоги PostgreSQL, медиа и сертификаты Caddy хранятся в именованных Docker volumes и не удаляются при обновлении контейнеров.
 
+Сервис `migrate` применяет миграции Payload перед запуском приложения. Чтобы заполнить новую базу стартовыми материалами, выполните:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yml run --rm --no-deps -e SEED_MODE=if-empty migrate pnpm seed:clinic
+```
+
 ## Без Docker
 
 ```bash
@@ -77,7 +83,7 @@ pnpm start
 
 ## Первый администратор
 
-После первого запуска откройте `/admin` и создайте владельца CMS. Используйте уникальный пароль и менеджер паролей. После этого создание новых администраторов доступно только авторизованным пользователям.
+Для VPS укажите публичный IP владельца CMS в `ADMIN_SETUP_IP` и пересоздайте контейнер Caddy. Владелец с этого IP может открыть `/admin` и создать первый аккаунт с уникальным паролем. После регистрации удалите `ADMIN_SETUP_IP` и снова пересоздайте Caddy. Создание следующих администраторов доступно авторизованным пользователям.
 
 ## Обновление и откат
 

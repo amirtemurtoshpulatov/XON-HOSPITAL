@@ -17,11 +17,12 @@ RUN \
   fi
 
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Source and CLI used by the one-shot database maintenance service.
+FROM deps AS tooling
 COPY . .
+
+# Rebuild the source code only when needed
+FROM tooling AS builder
 
 # Payload initializes while Next.js builds. Production data is loaded at
 # request time, so the build uses an isolated throwaway SQLite database and a
@@ -36,7 +37,7 @@ ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL}
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN corepack enable && corepack prepare pnpm@11.25.0 --activate && pnpm run build
+RUN pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

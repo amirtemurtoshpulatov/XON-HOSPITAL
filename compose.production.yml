@@ -16,6 +16,20 @@ services:
       retries: 20
     restart: unless-stopped
 
+  migrate:
+    build:
+      context: .
+      target: tooling
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+    command: ['pnpm', 'payload', 'migrate']
+    depends_on:
+      database:
+        condition: service_healthy
+
   web:
     build:
       context: .
@@ -30,8 +44,8 @@ services:
     volumes:
       - media:/app/public/media
     depends_on:
-      database:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     expose:
       - '3000'
     restart: unless-stopped
