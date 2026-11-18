@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
       {
-        pathname: '/xon-hospital-logo.jpeg',
+        pathname: '/xon-hospital-logo.webp',
       },
       {
         pathname: '/doctors/**',

@@ -19,6 +19,7 @@ import { XonVideoSection } from '@/components/XonVideo'
 import { JsonLd } from '@/components/JsonLd'
 import { listArticles } from '@/lib/clinicContent'
 import { siteOrigin } from '@/lib/xonSeo'
+import { xonLogo } from '@/lib/xonBrand'
 import './styles.css'
 
 const defaultProgramSlugs = ['check-up', 'rehabilitation', 'salt-room', 'orthopedics']
@@ -105,7 +106,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
           '@id': `${origin}/ru#clinic`, url: `${origin}/ru`, telephone: phone.replace(/[^\d+]/g, ''),
           address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressLocality: 'Tashkent', addressCountry: 'UZ' },
           sameAs: [clinicSocial.instagram, clinicSocial.youtube],
-          image: `${origin}/xon-hospital-logo.jpeg`, logo: `${origin}/xon-hospital-logo.jpeg`,
+          image: `${origin}${xonLogo.src}`, logo: `${origin}${xonLogo.src}`,
         },
       ],
     }} />
@@ -131,7 +132,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
           <Link className={`xon-clinic-visual${heroMedia?.url ? ' has-photo' : ''}`} href={`${prefix}/about`} aria-label={t.nav[2]}>
             {heroMedia?.url
               ? <Image src={heroMedia.url} alt={heroMedia.alt || ''} fill sizes="(max-width: 760px) 94vw, 42vw" preload unoptimized />
-              : <Image src="/xon-hospital-logo.jpeg" alt="" width={176} height={176} preload />}
+              : <Image src={xonLogo.src} alt="" width={176} height={176} preload />}
             <span className="xon-clinic-caption">{t.nav[2]}<ArrowUpRight size={18} aria-hidden="true" /></span>
           </Link>
           <nav className="xon-hero-shortcuts" aria-label={ui.navigation}>
