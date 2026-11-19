@@ -1,9 +1,23 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { REST_GET, REST_POST } from '@payloadcms/next/routes'
+import type { NextRequest } from 'next/server'
+import { roleOf } from '@/access/roles'
 
 const attempts = new Map<string, { count: number; resetAt: number }>()
 
+const collectionContext = () => ({ params: Promise.resolve({ slug: ['leads'] }) })
+// Keep the public booking endpoint compatible with the CMS collection API.
+export async function GET(request: NextRequest) {
+  return REST_GET(configPromise)(request, collectionContext())
+}
 export async function POST(request: Request) {
+  if (request.headers.get('cookie')?.includes('payload-token=') || request.headers.has('authorization')) {
+    const payload = await getPayload({ config: configPromise })
+    const { user } = await payload.auth({ headers: request.headers })
+    if (['owner', 'manager'].includes(roleOf(user) || '')) return REST_POST(configPromise)(request as NextRequest, collectionContext())
+  }
+
   const forwarded = request.headers.get('x-forwarded-for') || 'local'
   const ip = forwarded.split(',')[0]?.trim() || 'unknown'
   const now = Date.now()
