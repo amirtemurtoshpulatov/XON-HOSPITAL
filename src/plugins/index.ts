@@ -1,3 +1,4 @@
+import { canEditContent, canManageLeads, isOwner } from '@/access/roles'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
@@ -28,6 +29,7 @@ export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {
+      access: { create: canEditContent, update: canEditContent, delete: canEditContent },
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
@@ -59,7 +61,9 @@ export const plugins: Plugin[] = [
     fields: {
       payment: false,
     },
+    formSubmissionOverrides: { access: { read: canManageLeads, update: canManageLeads, delete: isOwner } },
     formOverrides: {
+      access: { create: isOwner, update: isOwner, delete: isOwner },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
@@ -85,6 +89,7 @@ export const plugins: Plugin[] = [
     collections: ['posts'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
+      access: { create: canEditContent, update: canEditContent, delete: canEditContent },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },
