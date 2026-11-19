@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: Props) {
   const title = service?.title || fallback?.title
   if (!title) return {}
   const cover = typeof service?.cover === 'object' ? service.cover : null
-  return pageSEO(locale, `/services/${slug}`, {
+  const metadata = pageSEO(locale, `/services/${slug}`, {
     ...serviceSearchCopy(locale, slug, title, service?.summary || fallback?.text),
     image: cover?.url,
     imageAlt: cover?.alt ?? undefined,
     locales: await serviceLocales(slug),
-    ...(!isServiceAvailable(slug) ? { robots: { index: false, follow: true } } : {}),
   })
+  return { ...metadata, ...(!isServiceAvailable(slug) ? { robots: { index: false, follow: true } } : {}) }
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
