@@ -22,16 +22,20 @@ Updated: 2026-11-19. Verify live facts before making new claims.
 - On 2026-11-19, submitted https://xon-hospital.uz/sitemap.xml in the VERIFIED ROOT URL-prefix Search Console property https://xon-hospital.uz/ using the user's signed-in Chrome.
 - Search Console detail page then showed **Sitemap processed successfully**, **185 discovered pages**, last read 11/19/26. This is discovery, NOT proof of 185 indexed pages.
 - Root sitemap validated as XML with 185 URLs; HTTP 200 application/xml. robots.txt allows public pages and advertises the sitemap; excludes admin/API except public media files.
-- Existing erroneous /ru/sitemap.xml submission was not removed. Locale sitemap routes are being implemented in this update to make language-specific submissions work.
+- Existing erroneous /ru/sitemap.xml submission was not removed. Locale sitemap routes now work, so this previously missing URL returns a valid Russian map.
 
-## Current update — verify completion before describing as deployed
+## Deployed update: 7ee1146 (2026-11-19)
 
 - Added per-language sitemap handlers backed by shared clinicSitemap, maintaining cross-language alternates.
 - Added actual Instagram embeds to six doctor profiles, second founder reel, location reel to Contacts, Yandex Maps link in Contacts/footer and hasMap in clinic schema.
 - Reel IDs: founder DfFBaIAoZmj + Df4NZ7poib9; Ruslan DfKLM4FIOR3; Fayzullo DfOtyIlo8PU; Vohid DfUauc7I9Zd; Zafar DfWX_HtIDC0; Asilbek DfWk_eTINT-; location Dfy-vE_Ir3P.
 - User called Zafar “Muzaffarovich” but existing profile slug is zafar-abdirazzakov. Preserve the profile name pending confirmation; attach the user-mapped reel.
 - Official map: https://yandex.uz/maps/org/xon_hospital/63935219230/. Do not infer street/geo from the viewport coordinates in the shared URL.
-- Added long-form article outline component and original acne article source in src/scripts/acneArticle.ts, ru + uz. Publisher src/scripts/publishEvidenceArticles.ts creates ONLY if slug absent; never overwrites existing CMS articles. Must be run against production using fresh tooling image, then verify publicly.
+- Added long-form article outline component and original acne article source in src/scripts/acneArticle.ts, ru + uz. Publisher src/scripts/publishEvidenceArticles.ts creates ONLY if slug absent; never overwrites existing CMS articles. It was run successfully against production with a fresh tooling image.
+- Published https://xon-hospital.uz/ru/articles/acne-causes-care-treatment and its /uz/ counterpart. 11 sections each, 838 Russian / 715 Uzbek words, eight clinical references. No author/reviewer fabricated.
+- Production Docker build passed, web container replaced successfully, logs contain no runtime errors. TypeScript and targeted ESLint passed. All six sitemap XMLs validated: root187, ru38, uz38, en37, kk37, tg37, with no duplicate URLs. Google previously read185; the new two URLs await Google's next read.
+- Confirmed all six doctor pages contain the supplied Instagram embeds, founder has two. Existing YouTube introductions retained where applicable. Both new article pages have correct canonical URLs, 11 working section anchors and no noindex. Missing English translation and invalid-locale sitemap return404.
+- Database backup before publication: /opt/xon-backups/before-evidence-20261119.sql.gz, root-only permissions, gzip integrity checked. Rollback image xon-hospital-web:rollback-1a7ef50 preserved.
 - Existing two CMS prevention articles and two fallback guides remain short: expand in subsequent content batches, preserving editorial changes. No claim of clinician review until one actually occurs.
 
 ## Deploy and checks
