@@ -72,6 +72,7 @@ export interface Config {
     services: Service;
     prices: Price;
     leads: Lead;
+    'lead-comments': LeadComment;
     'clinic-articles': ClinicArticle;
     posts: Post;
     media: Media;
@@ -101,6 +102,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     prices: PricesSelect<false> | PricesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    'lead-comments': LeadCommentsSelect<false> | LeadCommentsSelect<true>;
     'clinic-articles': ClinicArticlesSelect<false> | ClinicArticlesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -442,6 +444,7 @@ export interface Category {
  */
 export interface User {
   id: number;
+  role: 'owner' | 'manager' | 'editor';
   name?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1042,11 +1045,35 @@ export interface Lead {
   comment?: string | null;
   locale?: ('ru' | 'uz' | 'en' | 'kk' | 'tg') | null;
   status: 'new' | 'processing' | 'booked' | 'completed' | 'unreachable';
+  assignedTo?: (number | null) | User;
+  nextContactAt?: string | null;
+  statusHistory?:
+    | {
+        from?: string | null;
+        to?: string | null;
+        at?: string | null;
+        authorName?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   source?: string | null;
   utmSource?: string | null;
   utmCampaign?: string | null;
   sheetSync?: ('pending' | 'synced' | 'failed') | null;
   consent: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-comments".
+ */
+export interface LeadComment {
+  id: number;
+  lead: number | Lead;
+  text: string;
+  author?: (number | null) | User;
+  authorName?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1344,6 +1371,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'leads';
         value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'lead-comments';
+        value: number | LeadComment;
       } | null)
     | ({
         relationTo: 'clinic-articles';
@@ -1759,11 +1790,34 @@ export interface LeadsSelect<T extends boolean = true> {
   comment?: T;
   locale?: T;
   status?: T;
+  assignedTo?: T;
+  nextContactAt?: T;
+  statusHistory?:
+    | T
+    | {
+        from?: T;
+        to?: T;
+        at?: T;
+        authorName?: T;
+        id?: T;
+      };
   source?: T;
   utmSource?: T;
   utmCampaign?: T;
   sheetSync?: T;
   consent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-comments_select".
+ */
+export interface LeadCommentsSelect<T extends boolean = true> {
+  lead?: T;
+  text?: T;
+  author?: T;
+  authorName?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1975,6 +2029,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   name?: T;
   updatedAt?: T;
   createdAt?: T;

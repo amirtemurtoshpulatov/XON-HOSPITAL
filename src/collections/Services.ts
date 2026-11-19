@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { canEditContent } from '../access/roles'
 
 export const Services: CollectionConfig = {
   slug: 'services',
@@ -12,10 +12,10 @@ export const Services: CollectionConfig = {
     defaultColumns: ['title', 'category', 'featured', 'updatedAt'],
   },
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: canEditContent,
+    delete: canEditContent,
     read: anyone,
-    update: authenticated,
+    update: canEditContent,
   },
   fields: [
     { name: 'title', label: 'Название', type: 'text', required: true, localized: true },

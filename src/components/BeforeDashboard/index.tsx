@@ -1,3 +1,4 @@
+import { XonAdminDashboard } from '@/components/XonAdminDashboard'
 import { XonAdminIcon } from '@/components/XonAdminBrand'
 import Link from 'next/link'
 
@@ -5,6 +6,7 @@ import './index.scss'
 
 export default function BeforeDashboard() {
   return (
+    <>
     <section className="before-dashboard">
       <div className="before-dashboard__heading">
         <XonAdminIcon />
@@ -18,5 +20,7 @@ export default function BeforeDashboard() {
         <Link href="/ru">Открыть сайт</Link>
       </nav>
     </section>
+    <XonAdminDashboard />
+    </>
   )
 }

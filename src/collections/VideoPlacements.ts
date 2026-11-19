@@ -1,7 +1,7 @@
 import type { CollectionConfig, Validate } from 'payload'
 
 import { videoFields } from '@/fields/video'
-import { authenticated } from '@/access/authenticated'
+import { canEditContent } from '@/access/roles'
 
 const sections = [
   ['home:hero', 'Главная — после первого экрана'],
@@ -35,7 +35,7 @@ export const VideoPlacements: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'section', 'visible', 'sortOrder'],
   },
-  access: { create: authenticated, update: authenticated, delete: authenticated, read: ({ req }) => req.user ? true : { visible: { equals: true } } },
+  access: { create: canEditContent, update: canEditContent, delete: canEditContent, read: ({ req }) => req.user ? true : { visible: { equals: true } } },
   fields: [
     {
       name: 'section', label: 'Где показать', type: 'select', index: true, required: true,

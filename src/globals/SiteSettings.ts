@@ -1,12 +1,12 @@
 import type { GlobalConfig } from 'payload'
 
-import { authenticated } from '../access/authenticated'
+import { canEditContent } from '../access/roles'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Настройки сайта',
   admin: { group: 'Сайт' },
-  access: { read: () => true, update: authenticated },
+  access: { read: () => true, update: canEditContent },
   fields: [
     { name: 'clinicName', label: 'Название клиники', type: 'text', defaultValue: 'XON HOSPITAL', localized: true },
     { name: 'tagline', label: 'Короткое позиционирование', type: 'text', localized: true },

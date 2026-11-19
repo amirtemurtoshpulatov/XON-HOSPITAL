@@ -12,6 +12,7 @@ import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
 import { Doctors } from './collections/Doctors'
 import { Leads } from './collections/Leads'
+import { LeadComments } from './collections/LeadComments'
 import { Prices } from './collections/Prices'
 import { Services } from './collections/Services'
 import { VideoFiles } from './collections/VideoFiles'
@@ -96,7 +97,7 @@ export default buildConfig({
     defaultLocale: 'ru',
     fallback: true,
   },
-  collections: [Pages, Doctors, Services, Prices, Leads, ClinicArticles, Posts, Media, VideoFiles, VideoPlacements, Categories, Users],
+  collections: [Pages, Doctors, Services, Prices, Leads, LeadComments, ClinicArticles, Posts, Media, VideoFiles, VideoPlacements, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [HomePage, SiteSettings, Header, Footer],
   plugins,

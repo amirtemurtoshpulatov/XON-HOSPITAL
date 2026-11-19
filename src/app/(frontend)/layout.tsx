@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 
+import { XonAnalytics } from '@/components/XonAnalytics'
 import { AdminBar } from '@/components/AdminBar'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
 
           {children}
+          {!isEnabled && process.env.GA_MEASUREMENT_ID && <XonAnalytics measurementId={process.env.GA_MEASUREMENT_ID} locale={locale} />}
         </Providers>
       </body>
     </html>

@@ -1,13 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { canEditContent } from '../access/roles'
 
 export const Prices: CollectionConfig = {
   slug: 'prices',
   labels: { singular: 'Цена', plural: 'Цены и программы' },
   admin: { group: 'Клиника', useAsTitle: 'title', defaultColumns: ['title', 'price', 'active'] },
-  access: { create: authenticated, delete: authenticated, read: anyone, update: authenticated },
+  access: { create: canEditContent, delete: canEditContent, read: anyone, update: canEditContent },
   fields: [
     { name: 'title', label: 'Название', type: 'text', required: true, localized: true },
     { name: 'description', label: 'Описание', type: 'textarea', localized: true },

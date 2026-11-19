@@ -32,7 +32,7 @@ These are observed patterns and opportunities, not proven causes of competitors'
 | Route | Concrete work | Measurement / dependency |
 | --- | --- | --- |
 | Technical indexing | Successful canonical HTTPS pages, proper404s, correct robots and hreflang, XML sitemap of usable translated pages; fix actual errors. | Search Console indexed pages and URL inspection. Discovery is not indexing. |
-| Local Google / Yandex /2GIS | Find existing profile before creating one; verify owner; consistent name, address, phone, category and hours; real exterior/entrance photos, website link. | Calls, direction requests and website clicks from business profiles. Verification may require the owner. |
+| Local listings (deferred) | Google Business work is cancelled by the user. Other directory work requires an explicit agreed scope. Website address/phone/hours remain consistent. | No new listing or duplicate profile created in this batch. |
 | Specialty / service searches | A substantive page for each actual service: complaints, consultation process, available assessments, doctors, preparation, confirmed prices, questions and appointment route. | Relevant impressions, clicks and enquiries per service URL, by language. |
 | Patient information | Original, useful articles grouped around our specialties; clinical sources, real author/reviewer when reviewed, current dates, natural internal links. | Queries and engaged visits to the articles; subsequent service visits/enquiries. |
 | Internal discovery | Link services to related articles and doctors, and articles back to appropriate service/doctor pages; clear navigation and breadcrumbs. | Crawlable links, no orphan pages, verified translated links. |
@@ -59,21 +59,28 @@ Search intents below are editorial targets, not measured-volume keyword research
 | Oncology | консультация онколога Ташкент | Toshkentda onkolog maslahati | /services/oncology; diagnosis review, second opinion and routing without treatment guarantees. |
 | Check-up | deferred until launch | ishga tushguncha kechiktiriladi | Status page only; no fabricated packages or paid campaign. |
 
-## Implementation status for this work batch
+## Verified implementation and indexing status
 
-Already verified live before this new batch: sitemap accepted by Google with185 discovered URLs;187 URLs after publishing the ru/uz acne article; all11 doctor profiles expanded on five languages (55 pages),6–12 reasons per doctor; Instagram embeds and map link; transparent favicon assets accessible200; mobile article navigation and typography tested.
+Production verification on2026-11-19:
 
-Current code batch awaiting deployment verification: localized service search titles, ProfilePage/Person and Service structured data, service→article→doctor links, consistent transparent OG logo, confirmed address/hours in CMS, explicit night-care notice, check-up status/noindex and exclusion from active offers/sitemaps. Expected sitemap after removing five check-up URLs:182.
+- Search Console root property: **/sitemap.xml Success,182 discovered URLs**. Re-submitted Russian map **/ru/sitemap.xml Success,37 discovered URLs**; its former fetch error is resolved.
+- URL Inspection: /ru and /uz homepages and /ru/articles/acne-causes-care-treatment **indexed**. Russian dermatology page discovered but not yet indexed; request accepted into Google's priority crawl queue. Repeated submissions do not improve priority.
+- Aggregate Pages report still processing. No claim that all182 URLs are indexed.
+- HTTP audit of182 canonical sitemap URLs:200, title/description, exactly oneH1, matching canonical and HTML language, no noindex, valid JSON-LD and alternate targets. Reusable checker: scripts/audit-live-seo.py. This is not a ranking or Core Web Vitals measurement.
+- Localized service search titles, Service and ProfilePage/Person structured data, related service/article/doctor links and transparent OG branding deployed.
+- Owner-confirmed address and nuanced night-care hours published all5 locales. Check-up status page noindex; excluded from offers and sitemap until launch.
+- All55 localized doctor profiles expanded to6–12 reasons to visit. Instagram embeds/map links verified.
+- Dermatology, gastroenterology and ultrasound:5 original sections each in Russian/Uzbek, preserved existing text, relevant doctors and symptoms. Repeat enrichment dry-run0 changes.
+- Acne article Russian/Uzbek:11 sections, sources and working outline. Two existing prevention articles expanded in Russian/Uzbek to7 sections each, approximately300–350 words; original practical explanations with sources. No invented clinician author/reviewer.
 
-Next content work: substantively improve existing service pages, beginning with dermatology, gastroenterology and ultrasound in ru/uz. Expand the existing short prevention guides, then publish the topic groups above after research. A large article count is not a substitute for useful, medically responsible pages.
+## Practical next priorities
 
-## Practical rollout and review
-
-- First: deploy and verify the current technical/business-fact corrections; inspect representative URLs and valid structured data.
-- Next: verify the existing Google business listing and complete its information/photos/hours; collect licence/approved-pricing and clinician-review details.
-- Content: small, researched groups tied to actual services; no arbitrary hundreds-of-articles quota or promised ranking deadline.
-- Review progress from Search Console query/page/language data and actual enquiries; improve pages with impressions but low clicks, and useful pages Google excludes. Allow time for recrawling.
-- Search-result layouts, favicon refreshes, sitelinks and business panels are selected by Google. There is no responsible#1 guarantee or exact layout toggle.
+- **Google Business Profile work cancelled by the user.** Do not create or edit a listing. The website/indexing work proceeds independently.
+- After Google populates Pages and Performance reports, evaluate actual excluded URLs, queries, clicks and languages; fix identified causes rather than repeatedly submitting every URL.
+- Content: next develop researched hair-loss, heartburn and headache guides tied to real specialties. Use clinical sources and original explanations. Have a clinician review before labelling a page as reviewed; preserve editorial CMS changes.
+- Add approved prices, clinic legal/licence information and reviewer details when supplied. Analytics connection is now explicitly requested; inspect the owner's existing GA4 setup before adding a tag. Measurement ID is public; never publish secret credentials.
+- Measure mobile performance and field Core Web Vitals once data is available, and improve confirmed slow/unstable elements.
+- Search-result layouts, favicon refreshes, sitelinks and business panels are selected by Google. No#1 guarantee, fixed indexing deadline or arbitrary article-count target.
 
 ## Primary Google references
 

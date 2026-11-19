@@ -1,6 +1,6 @@
 import type { CollectionConfig, Validate } from 'payload'
 
-import { authenticated } from '@/access/authenticated'
+import { canEditContent } from '@/access/roles'
 import { authenticatedOrPublished } from '@/access/authenticatedOrPublished'
 import { httpsLink } from '@/lib/xonVideo'
 
@@ -13,7 +13,7 @@ export const ClinicArticles: CollectionConfig = {
   slug: 'clinic-articles',
   labels: { singular: 'Статья', plural: 'Статьи для пациентов' },
   admin: { group: 'Клиника', useAsTitle: 'title', defaultColumns: ['title', '_status', 'publishedAt'] },
-  access: { create: authenticated, update: authenticated, delete: authenticated, read: authenticatedOrPublished },
+  access: { create: canEditContent, update: canEditContent, delete: canEditContent, read: authenticatedOrPublished },
   fields: [
     { name: 'title', label: 'Заголовок', type: 'text', localized: true, required: true },
     { name: 'slug', label: 'Адрес статьи', type: 'text', required: true, unique: true, validate: validateSlug },

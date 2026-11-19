@@ -1,4 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
+import { canEditContent } from '@/access/roles'
 
 const videoMimeTypes = ['video/mp4', 'video/webm']
 const maxBytes = 16 * 1024 * 1024
@@ -22,9 +23,9 @@ export const VideoFiles: CollectionConfig = {
     description: 'Файлы MP4 или WebM до 16 МБ. Для более длинных роликов вставьте ссылку на YouTube, Instagram или Vimeo.',
   },
   access: {
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    create: canEditContent,
+    update: canEditContent,
+    delete: canEditContent,
     read: ({ isReadingStaticFile }) => isReadingStaticFile ? { id: { exists: true } } : true,
   },
   defaultPopulate: { filename: true },

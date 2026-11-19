@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { canEditContent } from '../access/roles'
 import { videoFields } from '@/fields/video'
 
 export const Doctors: CollectionConfig = {
@@ -13,10 +13,10 @@ export const Doctors: CollectionConfig = {
     defaultColumns: ['name', 'specialty', 'featured', 'updatedAt'],
   },
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: canEditContent,
+    delete: canEditContent,
     read: anyone,
-    update: authenticated,
+    update: canEditContent,
   },
   fields: [
     { name: 'name', label: 'Имя и фамилия', type: 'text', required: true, localized: true },

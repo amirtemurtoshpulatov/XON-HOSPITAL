@@ -1,12 +1,12 @@
 import type { GlobalConfig } from 'payload'
 
-import { authenticated } from '../access/authenticated'
+import { canEditContent } from '../access/roles'
 
 export const HomePage: GlobalConfig = {
   slug: 'home-page',
   label: 'Главная страница',
   admin: { group: 'Сайт' },
-  access: { read: () => true, update: authenticated },
+  access: { read: () => true, update: canEditContent },
   fields: [
     {
       type: 'tabs',

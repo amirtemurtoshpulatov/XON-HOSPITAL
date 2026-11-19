@@ -16,3 +16,6 @@ blob-report
 public/media
 *.log
 .DS_Store
+
+# Private server-only service-account credentials
+credentials/
