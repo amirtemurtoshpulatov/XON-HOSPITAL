@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '@payloadcms/ui'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lead, LeadComment, User } from '@/payload-types'
 import type { TrafficReport } from '@/lib/gaReporting'
 import { roleOf } from '@/access/roles'
@@ -58,6 +58,7 @@ export function XonAdminDashboard() {
   const [comments, setComments] = useState<LeadComment[]>([])
   const [comment, setComment] = useState('')
   const [commentsLoading, setCommentsLoading] = useState(false)
+  const threadRef = useRef<HTMLElement>(null)
   const load = useCallback(async (next = 1) => {
     setError(''); setLoading(true)
     try {
@@ -69,6 +70,7 @@ export function XonAdminDashboard() {
   }, [])
   useEffect(() => { if (crmAccess) void load() }, [crmAccess, load])
   const selectedID = selected?.id
+  useEffect(() => { if (selectedID) threadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, [selectedID])
   useEffect(() => {
     if (!selectedID) return
     const abort = new AbortController()
@@ -121,6 +123,7 @@ export function XonAdminDashboard() {
           if (lead && lead.status !== status) void move(lead.id, status)
         }}><h3>{label}<span>{filtered.filter((lead) => lead.status === status).length}</span></h3>
           {filtered.filter((lead) => lead.status === status).map((lead) => <article className="xon-crm-card" key={lead.id} draggable={!busy} onDragStart={(event) => event.dataTransfer.setData('text/plain', String(lead.id))}>
+            <span className="xon-crm-handle" aria-hidden="true">⠿ Перетащить</span>
             <button className="xon-crm-name" onClick={() => { setSelected(lead); setComments([]); setComment(''); setError('') }}>{lead.name}</button>
             <a href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`}>{lead.phone}</a>
             {lead.serviceInterest && <p>{lead.serviceInterest}</p>}<small>{stamp(lead.createdAt)} · {lead.locale?.toUpperCase()}</small>
@@ -131,7 +134,7 @@ export function XonAdminDashboard() {
         </section>)}
       </div>
       {more && <button disabled={loading} onClick={() => void load(page + 1)}>Загрузить ещё 50</button>}
-      {selected && <section className="xon-crm-thread" aria-label={`Заявка: ${selected.name}`}><header><h3>{selected.name}</h3><button onClick={() => setSelected(null)}>Закрыть</button></header>
+      {selected && <section ref={threadRef} className="xon-crm-thread" aria-label={`Заявка: ${selected.name}`}><header><h3>{selected.name}</h3><button onClick={() => setSelected(null)}>Закрыть</button></header>
         <p><a href={`tel:${selected.phone.replace(/[^+\d]/g, '')}`}>{selected.phone}</a> · {statusName(selected.status)}</p>
         {selected.comment && <p><strong>Комментарий из заявки:</strong> {selected.comment}</p>}
         <div className="xon-dash-actions"><Link href={`/admin/collections/leads/${selected.id}`}>Открыть карточку заявки</Link>{role === 'owner' && <button className="xon-dash-delete" disabled={busy} onClick={() => void remove(selected)}>Удалить заявку</button>}</div>

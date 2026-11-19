@@ -73,7 +73,11 @@ export function XonAnalytics({ measurementId, locale }: { measurementId: string;
     {enabled && <Script id="xon-ga4" src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} strategy="afterInteractive" onReady={() => {
       if (readChoice() !== 'accepted') return
       window.dataLayer = window.dataLayer || []
-      window.gtag = window.gtag || function (...args: unknown[]) { window.dataLayer!.push(args) }
+      window.gtag = window.gtag || function () {
+        // Google's documented queue uses an Arguments object for each command.
+        // eslint-disable-next-line prefer-rest-params
+        window.dataLayer!.push(arguments)
+      }
       window.gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' })
       window.gtag('js', new Date())
       window.gtag('config', measurementId, {

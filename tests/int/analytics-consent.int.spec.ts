@@ -23,7 +23,7 @@ describe('GA4 consent lifecycle', () => {
   it('queues one page view after acceptance and disables collection on revocation', async () => {
     const ui = render(createElement(XonAnalytics, { measurementId: 'G-TEST123', locale: 'ru' }))
     fireEvent.click(ui.getByText('Разрешить'))
-    await waitFor(() => expect((window.dataLayer || []).filter((item) => Array.isArray(item) && item[0] === 'event' && item[1] === 'page_view')).toHaveLength(1))
+    await waitFor(() => expect((window.dataLayer || []).map((item) => Array.from(item as ArrayLike<unknown>)).filter((item) => item[0] === 'event' && item[1] === 'page_view')).toHaveLength(1))
     fireEvent.click(ui.getByText('Аналитика'))
     fireEvent.click(ui.getByText('Без аналитики'))
     expect((window as unknown as Record<string, unknown>)['ga-disable-G-TEST123']).toBe(true)
