@@ -14,7 +14,7 @@ type Starter = {
   sources: { label: string; url: string }[]
 }
 
-const starters: Starter[] = [
+export const starters: Starter[] = [
   {
     slug: 'blood-pressure-at-home',
     service: 'therapy',
@@ -41,7 +41,7 @@ const starters: Starter[] = [
   },
   {
     slug: 'movement-for-prevention',
-    service: 'check-up',
+    service: 'therapy',
     title: ['Физическая активность для профилактики', 'Profilaktika uchun jismoniy faollik', 'Physical activity for preventive health', 'Алдын алу үшін дене белсенділігі', 'Фаъолияти ҷисмонӣ барои пешгирӣ'],
     description: ['Как добавить движение в привычный день и постепенно выстроить регулярную нагрузку.', 'Odatiy kunga ko‘proq harakat qo‘shish va muntazam faollikni asta-sekin yo‘lga qo‘yish.', 'Ways to move more during a typical day and build a regular activity routine.', 'Күнделікті өмірге қозғалыс қосу және тұрақты жүктемені біртіндеп қалыптастыру.', 'Чӣ гуна ҳаракатро ба рӯзгор ворид карда, машқи мунтазамро тадриҷан ба роҳ мондан мумкин аст.'],
     sections: [
@@ -62,7 +62,7 @@ const starters: Starter[] = [
   },
 ]
 
-function articleFields(starter: Starter, locale: SiteLocale) {
+export function articleFields(starter: Starter, locale: SiteLocale) {
   const children = starter.sections.flatMap(({ heading, text }) => [
     { type: 'heading', tag: 'h2', version: 1, direction: 'ltr', format: '', indent: 0, children: [textNode(translate(locale, heading))] },
     { type: 'paragraph', version: 1, direction: 'ltr', format: '', indent: 0, children: [textNode(translate(locale, text))] },
