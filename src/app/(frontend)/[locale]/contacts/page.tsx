@@ -32,7 +32,7 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
       <div className="xon-contact-lines">
         <div className="xon-contact-line"><small>{ui.phone}</small><a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a></div>
         <div className="xon-contact-line"><small>{ui.address}</small><strong>{settings.address || ui.city}</strong><a href={clinicSocial.maps} target="_blank" rel="noreferrer">{ui.directions} · Яндекс Карты ↗</a></div>
-        {settings.workingHours && <div className="xon-contact-line"><small>{ui.hours}</small><strong>{settings.workingHours}</strong></div>}
+        {settings.workingHours && <div className="xon-contact-line"><small>{ui.hours}</small><strong className="xon-hours">{settings.workingHours}</strong></div>}
         <div className="xon-social-links"><a href={clinicSocial.instagram} target="_blank" rel="noreferrer">Instagram ↗</a><a href={clinicSocial.youtube} target="_blank" rel="noreferrer">YouTube ↗</a></div>
       </div>
       <div className="xon-contact-form-wrap"><h2>{labels.formTitle}</h2><LeadForm locale={locale} labels={labels} /></div>

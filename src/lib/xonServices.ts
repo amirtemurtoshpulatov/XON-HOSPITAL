@@ -43,6 +43,11 @@ const additional = {
 
 export const serviceSlugs = [...baseSlugs, ...Object.keys(additional)]
 
+// The owner confirmed that check-up packages are still being developed.
+export function isServiceAvailable(slug: string) {
+  return slug !== 'check-up'
+}
+
 export function serviceCopy(locale: SiteLocale, slug: string) {
   const base = content[locale].serviceItems[baseSlugs.findIndex((item) => item === slug)]
   if (base) return base

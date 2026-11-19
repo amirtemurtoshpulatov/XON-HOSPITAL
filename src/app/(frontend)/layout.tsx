@@ -13,7 +13,7 @@ import { draftMode, headers } from 'next/headers'
 
 import './globals.css'
 import { indexableSite, siteOrigin } from '@/lib/xonSeo'
-import { xonIcons } from '@/lib/xonBrand'
+import { xonIcons, xonLogo } from '@/lib/xonBrand'
 import { localeCodes } from '@/components/XonHome/content'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   description: 'Диагностика, лечение и реабилитация в многопрофильной клинике XON HOSPITAL.',
   icons: xonIcons,
   openGraph: mergeOpenGraph({
-    images: [{ url: '/xon-hospital-logo.jpeg', width: 720, height: 720, alt: 'XON HOSPITAL' }],
+    images: [{ url: xonLogo.src, width: xonLogo.width, height: xonLogo.height, alt: 'XON HOSPITAL' }],
   }),
   twitter: {
     card: 'summary_large_image',

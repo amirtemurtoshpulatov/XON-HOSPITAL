@@ -5,7 +5,7 @@ import { cms, listArticles } from '@/lib/clinicContent'
 import { articleSlugs } from '@/lib/xonArticles'
 import { doctorDirectory } from '@/lib/xonDoctors'
 import { localizedURLs, siteOrigin, staticSections } from '@/lib/xonSeo'
-import { serviceSlugs } from '@/lib/xonServices'
+import { isServiceAvailable, serviceSlugs } from '@/lib/xonServices'
 
 export async function clinicSitemap(): Promise<MetadataRoute.Sitemap> {
   const payload = await cms()
@@ -36,9 +36,9 @@ export async function clinicSitemap(): Promise<MetadataRoute.Sitemap> {
     for (const doctor of doctorDirectory(locale, doctors.docs)) {
       add(`/doctors/${doctor.slug}`, locale, doctor.updatedAt, doctor.photoUrl)
     }
-    for (const slug of serviceSlugs) add(`/services/${slug}`, locale)
+    for (const slug of serviceSlugs.filter(isServiceAvailable)) add(`/services/${slug}`, locale)
     for (const service of services.docs) {
-      if (service.title) add(`/services/${service.slug}`, locale, service.updatedAt)
+      if (service.title && isServiceAvailable(service.slug)) add(`/services/${service.slug}`, locale, service.updatedAt)
     }
     for (const page of pages.docs) {
       if (page.slug && page.title && page.layout?.length) add(`/page/${page.slug}`, locale, page.updatedAt)

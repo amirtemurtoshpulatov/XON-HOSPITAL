@@ -11,7 +11,7 @@ import { content, type SiteLocale } from './content'
 import { XonHeader } from '@/components/XonHeader'
 import { XonFooter } from '@/components/XonFooter'
 import { clinicSocial, xonCopy } from '@/lib/xonCopy'
-import { serviceCopy, serviceSlugs } from '@/lib/xonServices'
+import { isServiceAvailable, serviceCopy, serviceSlugs } from '@/lib/xonServices'
 import { doctorDirectory, featuredDoctorSlugs } from '@/lib/xonDoctors'
 import { articleCopy, articleSlugs } from '@/lib/xonArticles'
 import { homeVideos } from '@/lib/xonVideoPlacements'
@@ -22,7 +22,7 @@ import { siteOrigin } from '@/lib/xonSeo'
 import { xonLogo } from '@/lib/xonBrand'
 import './styles.css'
 
-const defaultProgramSlugs = ['check-up', 'rehabilitation', 'salt-room', 'orthopedics']
+const defaultProgramSlugs = ['ultrasound', 'rehabilitation', 'salt-room', 'orthopedics']
 
 export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
   await connection()
@@ -64,6 +64,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
 
   const chosenServices = (home.featuredServices || []).filter((item) => typeof item === 'object')
   const serviceCards = (chosenServices.length ? chosenServices : services.docs).flatMap((service) => {
+    if (!isServiceAvailable(service.slug)) return []
     const copy = serviceCopy(locale, service.slug)
     const title = service.title || copy?.title
     return title ? [{ slug: service.slug, title, text: service.summary || copy?.text }] : []
@@ -81,10 +82,11 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
     text: item.text,
     slug: typeof item.service === 'object' ? item.service?.slug : undefined,
   }))
-  const programmeCards = programmes?.length ? programmes : defaultProgramSlugs.map((slug) => ({ slug, ...serviceCopy(locale, slug)! }))
+  const programmeCards = (programmes?.length ? programmes : defaultProgramSlugs.map((slug) => ({ slug, ...serviceCopy(locale, slug)! })))
+    .filter((item) => !item.slug || isServiceAvailable(item.slug))
   const shortcuts = [
     { href: '/doctors', label: t.nav[1], Icon: HeartPulse },
-    { href: '/services/check-up', label: serviceCopy(locale, 'check-up')!.title, Icon: ShieldCheck },
+    { href: '/services/ultrasound', label: serviceCopy(locale, 'ultrasound')!.title, Icon: ShieldCheck },
     { href: '/services/rehabilitation', label: serviceCopy(locale, 'rehabilitation')!.title, Icon: Sparkles },
   ]
   const style = {
@@ -98,7 +100,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
     <JsonLd data={{
       '@graph': [
         {
-          '@type': 'WebSite', '@id': `${origin}/#website`, name: 'XON Hospital', url: `${origin}/`,
+          '@type': 'WebSite', '@id': `${origin}/#website`, name: 'XON Hospital', alternateName: 'XON HOSPITAL', url: `${origin}/`,
           publisher: { '@id': `${origin}/ru#clinic` },
         },
         {
@@ -107,6 +109,11 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
           address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressLocality: 'Tashkent', addressCountry: 'UZ' },
           sameAs: [clinicSocial.instagram, clinicSocial.youtube],
           hasMap: clinicSocial.maps,
+          openingHoursSpecification: {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            opens: '00:00', closes: '23:59',
+          },
           image: `${origin}${xonLogo.src}`, logo: `${origin}${xonLogo.src}`,
         },
       ],
@@ -123,7 +130,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
             <Link className="xon-text-link dark" href={`${prefix}/doctors`}>{ui.chooseDoctor}<ArrowUpRight size={17} /></Link>
           </div>
           <dl className="xon-hero-metrics">
-            {(metrics?.length ? metrics : [{ value: '20', label: ui.doctorsCount }, { value: '15', label: ui.servicesCount }]).map(({ value, label }) =>
+            {(metrics?.length ? metrics : [{ value: '20', label: ui.doctorsCount }, { value: String(serviceSlugs.filter(isServiceAvailable).length), label: ui.servicesCount }]).map(({ value, label }) =>
               <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
             )}
           </dl>
@@ -155,7 +162,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
     <section className="xon-services" id="services">
       <div className="xon-section-head"><p className="xon-label">{t.servicesLabel}</p><h2>{t.servicesTitle}</h2><p>{t.servicesText}</p></div>
       <div className="xon-service-list">
-        {(serviceCards.length ? serviceCards : serviceSlugs.slice(0, 8).map((slug) => ({ slug, ...serviceCopy(locale, slug)! }))).map((item, index) => (
+        {(serviceCards.length ? serviceCards : serviceSlugs.filter(isServiceAvailable).slice(0, 8).map((slug) => ({ slug, ...serviceCopy(locale, slug)! }))).map((item, index) => (
           <article key={item.slug} className="xon-service-card"><span>{String(index + 1).padStart(2, '0')}</span><h3>{item.title}</h3><p>{item.text}</p><Link href={`${prefix}/services/${item.slug}`} aria-label={`${item.title} · ${ui.more}`}><ArrowUpRight /></Link></article>
         ))}
       </div>

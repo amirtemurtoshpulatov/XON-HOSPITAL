@@ -29,7 +29,7 @@ const labels: Record<SiteLocale, {
 }
 
 const clinicLinks = ['services', 'doctors', 'about', 'prices', 'contacts']
-const serviceLinks = ['check-up', 'rehabilitation', 'neurology', 'orthopedics', 'oncology']
+const serviceLinks = ['ultrasound', 'rehabilitation', 'neurology', 'orthopedics', 'oncology']
 
 function externalHref(value: string | null | undefined, network: 'telegram' | 'instagram') {
   if (!value) return null

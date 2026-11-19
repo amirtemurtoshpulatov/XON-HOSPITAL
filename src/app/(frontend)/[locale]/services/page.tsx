@@ -8,7 +8,7 @@ import { XonInterior } from '@/components/XonInterior'
 import { interiorCopy } from '@/components/XonInterior/copy'
 import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 
-import { serviceCopy, serviceSlugs } from '@/lib/xonServices'
+import { isServiceAvailable, serviceCopy, serviceSlugs } from '@/lib/xonServices'
 
 import { sectionMetadata } from '@/lib/xonSeo'
 
@@ -23,7 +23,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const payload = await getPayload({ config: configPromise })
   const result = await payload.find({ collection: 'services', locale, fallbackLocale: false, limit: 100, sort: 'sortOrder' })
   const source = new Map(result.docs.map((service) => [service.slug, service]))
-  const slugs = [...new Set([...source.keys(), ...serviceSlugs])]
+  const slugs = [...new Set([...source.keys(), ...serviceSlugs])].filter(isServiceAvailable)
   const services = slugs.flatMap((slug, index) => {
     const service = source.get(slug)
     const fallback = serviceCopy(locale, slug)

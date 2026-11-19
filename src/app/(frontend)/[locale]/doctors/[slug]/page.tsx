@@ -4,12 +4,13 @@ import Link from 'next/link'
 
 import { XonInterior } from '@/components/XonInterior'
 import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
+import { JsonLd } from '@/components/JsonLd'
 import { XonVideoSection, type XonVideoItem } from '@/components/XonVideo'
 import RichText from '@/components/RichText'
 import { LeadForm } from '@/components/XonHome/LeadForm'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
 import { doctorLocales, findDoctor } from '@/lib/clinicContent'
-import { pageSEO } from '@/lib/xonSeo'
+import { pageSEO, siteOrigin } from '@/lib/xonSeo'
 import { xonCopy } from '@/lib/xonCopy'
 import { httpsLink, officialDoctorReels, officialDoctorVideo, videoEmbed } from '@/lib/xonVideo'
 import { visitGuideSlug } from '@/lib/xonArticles'
@@ -53,9 +54,22 @@ export default async function DoctorDetailPage({ params }: Props) {
     [ui.education, doctor.education], [ui.languages, doctor.languages?.map(({ label }) => label).join(' · ')],
   ]
   const appointment = [[ui.schedule, doctor.schedule], [ui.primaryPrice, doctor.primaryPrice], [ui.followUpPrice, doctor.followUpPrice]]
+  const url = new URL(`/${locale}/doctors/${slug}`, siteOrigin()).href
 
   return <XonInterior locale={locale} videoSection={`doctors/${slug}`} appointmentHref={doctor.acceptsAppointments !== false ? '#appointment' : undefined} eyebrow={doctor.specialty} title={doctor.name} intro={doctor.position} index="02">
     <ClinicBreadcrumbs locale={locale} section={{ path: '/doctors', label: t.nav[1] }} title={doctor.name} slug={slug} />
+    <JsonLd data={{
+      '@type': 'ProfilePage', '@id': `${url}#profile`, url, inLanguage: locale,
+      mainEntity: {
+        '@type': 'Person', '@id': `${siteOrigin()}/#doctor-${slug}`, name: doctor.name,
+        jobTitle: doctor.position || doctor.specialty,
+        description: doctor.shortBio || undefined,
+        image: doctor.photoUrl ? new URL(doctor.photoUrl, siteOrigin()).href : undefined,
+        knowsAbout: doctor.specialty,
+        worksFor: { '@type': 'MedicalClinic', '@id': `${siteOrigin()}/ru#clinic`, name: 'XON Hospital' },
+        sameAs: instagram ? [instagram] : undefined,
+      },
+    }} />
     <section className={`xon-page-content xon-detail${doctor.photoUrl ? '' : ' xon-detail-no-photo'}`}>
       {doctor.photoUrl && <div className="xon-profile-photo"><Image src={doctor.photoUrl} alt={doctor.name} fill sizes="(max-width: 900px) 88vw, 38vw" unoptimized={!doctor.photoUrl.startsWith('/doctors/')} /></div>}
       <div className="xon-detail-copy">

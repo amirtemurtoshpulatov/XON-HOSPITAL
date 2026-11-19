@@ -53,6 +53,17 @@ export const listArticles = cache(async (locale: SiteLocale) => {
   return docs.filter(hasArticleContent)
 })
 
+export const articlesForService = cache(async (locale: SiteLocale, serviceID: number) => {
+  const payload = await cms()
+  const { docs } = await payload.find({
+    collection: 'clinic-articles', locale, fallbackLocale: false, draft: false, overrideAccess: false,
+    where: { and: [{ _status: { equals: 'published' } }, { relatedService: { equals: serviceID } }] },
+    sort: '-publishedAt', pagination: false, depth: 0,
+    select: { title: true, slug: true, description: true, content: true },
+  })
+  return docs.filter(hasArticleContent)
+})
+
 export async function availableLocales(check: (locale: SiteLocale) => Promise<unknown>) {
   const exists = await Promise.all(localeCodes.map(check))
   return localeCodes.filter((_, index) => Boolean(exists[index]))

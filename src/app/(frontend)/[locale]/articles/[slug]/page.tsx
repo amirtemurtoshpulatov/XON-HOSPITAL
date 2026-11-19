@@ -7,7 +7,8 @@ import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
 import { JsonLd } from '@/components/JsonLd'
 import { XonArticleBody } from '@/components/XonArticleBody'
 import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
-import { articleLocales, findArticle } from '@/lib/clinicContent'
+import { articleLocales, findArticle, findService } from '@/lib/clinicContent'
+import { doctorProfile } from '@/lib/xonDoctors'
 import { articleCopy } from '@/lib/xonArticles'
 import { xonCopy } from '@/lib/xonCopy'
 import { pageSEO, siteOrigin } from '@/lib/xonSeo'
@@ -45,6 +46,12 @@ export default async function ArticlePage({ params }: Props) {
   const image = typeof entry?.cover === 'object' ? entry.cover : null
   const service = typeof entry?.relatedService === 'object' ? entry.relatedService : null
   const serviceTitle = service ? service.title || serviceCopy(locale, service.slug)?.title : null
+  const department = service ? await findService(locale, service.slug) : null
+  const relatedDoctors = (department?.doctors || []).flatMap((doctor) => {
+    if (typeof doctor !== 'object' || !doctor) return []
+    const profile = doctorProfile(locale, doctor.slug, doctor)
+    return profile ? [profile] : []
+  })
   const sources = (entry?.sources || (baseline ? [{ label: 'MedlinePlus', url: baseline.source }] : []))
     .filter((source) => httpsLink(source.url))
   const url = new URL(`/${locale}/articles/${slug}`, siteOrigin()).href
@@ -77,6 +84,10 @@ export default async function ArticlePage({ params }: Props) {
         <ul>{sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a></li>)}</ul>
       </section>}
       {service && serviceTitle && <Link className="xon-text-link" href={`/${locale}/services/${service.slug}`}>{serviceTitle} ↗</Link>}
+      {relatedDoctors.length > 0 && <section className="xon-article-sources">
+        <h2>{ui.chooseDoctor}</h2>
+        <ul>{relatedDoctors.map((doctor) => <li key={doctor.slug}><Link href={`/${locale}/doctors/${doctor.slug}`}>{doctor.name} · {doctor.specialty} ↗</Link></li>)}</ul>
+      </section>}
     </article>
   </XonInterior>
 }

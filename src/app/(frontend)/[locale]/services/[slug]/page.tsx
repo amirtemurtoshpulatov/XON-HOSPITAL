@@ -4,16 +4,18 @@ import { notFound } from 'next/navigation'
 
 import { XonInterior } from '@/components/XonInterior'
 import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
+import { JsonLd } from '@/components/JsonLd'
 import RichText from '@/components/RichText'
 import { LeadForm } from '@/components/XonHome/LeadForm'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
 
-import { serviceCopy } from '@/lib/xonServices'
+import { isServiceAvailable, serviceCopy } from '@/lib/xonServices'
 import { doctorProfile } from '@/lib/xonDoctors'
 import { xonCopy } from '@/lib/xonCopy'
 import { articleCopy, visitGuideSlug } from '@/lib/xonArticles'
-import { findService, serviceLocales } from '@/lib/clinicContent'
-import { pageSEO } from '@/lib/xonSeo'
+import { articlesForService, findService, serviceLocales } from '@/lib/clinicContent'
+import { pageSEO, siteOrigin } from '@/lib/xonSeo'
+import { serviceSearchCopy } from '@/lib/xonServiceSeo'
 
 type Props = { params: Promise<{ locale: string; slug: string }> }
 
@@ -27,11 +29,11 @@ export async function generateMetadata({ params }: Props) {
   if (!title) return {}
   const cover = typeof service?.cover === 'object' ? service.cover : null
   return pageSEO(locale, `/services/${slug}`, {
-    title,
-    description: service?.summary || fallback?.text,
+    ...serviceSearchCopy(locale, slug, title, service?.summary || fallback?.text),
     image: cover?.url,
     imageAlt: cover?.alt ?? undefined,
     locales: await serviceLocales(slug),
+    ...(!isServiceAvailable(slug) ? { robots: { index: false, follow: true } } : {}),
   })
 }
 
@@ -46,6 +48,10 @@ export default async function ServiceDetailPage({ params }: Props) {
   const summary = service?.summary || fallback?.text
   const t = content[locale]
   const ui = xonCopy(locale)
+  if (!isServiceAvailable(slug)) return <XonInterior locale={locale} videoSection={`services/${slug}`} eyebrow={ui.inDevelopment} title={title} intro={ui.developmentText} index="01">
+    <ClinicBreadcrumbs locale={locale} section={{ path: '/services', label: t.nav[0] }} title={title} slug={slug} />
+    <section className="xon-page-content"><Link className="xon-text-link" href={`/${locale}/doctors`}>{ui.chooseDoctor} ↗</Link></section>
+  </XonInterior>
   const relatedDoctors = (service?.doctors || []).flatMap((doctor) => {
     if (typeof doctor !== 'object' || !doctor) return []
     const profile = doctorProfile(locale, doctor.slug, doctor)
@@ -61,9 +67,18 @@ export default async function ServiceDetailPage({ params }: Props) {
   const advantages = service?.advantages || []
   const prices = service?.prices || []
   const faq = service?.faq || []
+  const articles = service?.id ? await articlesForService(locale, service.id) : []
+  const url = new URL(`/${locale}/services/${slug}`, siteOrigin()).href
 
   return <XonInterior locale={locale} videoSection={`services/${slug}`} eyebrow={service?.eyebrow || ui.info} title={title} intro={summary} index="01">
     <ClinicBreadcrumbs locale={locale} section={{ path: '/services', label: t.nav[0] }} title={title} slug={slug} />
+    {['ent', 'therapy'].includes(slug) && <aside className="xon-service-notice"><strong>24/7</strong><p>{ui.nightCare}</p></aside>}
+    <JsonLd data={{
+      '@type': 'Service', '@id': `${url}#service`, name: title, description: summary,
+      url, mainEntityOfPage: url,
+      provider: { '@type': 'MedicalClinic', '@id': `${siteOrigin()}/ru#clinic`, name: 'XON Hospital', url: `${siteOrigin()}/ru` },
+      areaServed: { '@type': 'City', name: 'Tashkent' },
+    }} />
     {facts.length > 0 && <section className="xon-service-facts" aria-label={ui.facts}>{facts.map((fact) => <div key={fact.id || `${fact.label}-${fact.value}`}><small>{fact.label}</small><strong>{fact.value}</strong></div>)}</section>}
     <section className={`xon-page-content xon-detail${cover ? '' : ' xon-detail-no-photo'}`}>
       {cover && <div className="xon-detail-media" style={{ backgroundImage: `url(${cover})` }} />}
@@ -74,6 +89,12 @@ export default async function ServiceDetailPage({ params }: Props) {
     {(advantages.length > 0 || prices.length > 0) && <section className="xon-service-evidence"><div>{advantages.length > 0 && <><h2>{ui.advantages}</h2><ul>{advantages.map((item) => <li key={item.id || item.label}><Check size={18} />{item.label}</li>)}</ul></>}</div>{prices.length > 0 && <div className="xon-service-prices"><p className="xon-label">{t.nav[3]}</p>{prices.map((item) => <div key={item.id || `${item.title}-${item.price}`}><span><strong>{item.title}</strong><small>{item.category}</small></span><b>{item.price}</b></div>)}</div>}</section>}
     {relatedDoctors.length > 0 && <section className="xon-page-content"><div className="xon-section-title"><h2>{t.nav[1]}</h2></div><div className="xon-related-doctors">{relatedDoctors.map((doctor) => <Link key={doctor.slug} href={`/${locale}/doctors/${doctor.slug}`}><span>{doctor.specialty}</span><h3>{doctor.name}</h3><p>{doctor.experience || doctor.position}</p><ArrowUpRight /></Link>)}</div></section>}
     {faq.length > 0 && <section className="xon-page-content xon-faq"><div className="xon-section-title"><h2>{ui.faq}</h2></div><div>{faq.map((item) => <details key={item.id || item.question}><summary>{item.question}<span>+</span></summary><p>{item.answer}</p></details>)}</div></section>}
+    {articles.length > 0 && <section className="xon-page-content xon-service-articles">
+      <div className="xon-section-title"><h2>{ui.journal}</h2></div>
+      <div className="xon-list-grid">{articles.map((article) => <Link className="xon-list-card" href={`/${locale}/articles/${article.slug}`} key={article.slug}>
+        <h3>{article.title}</h3><p>{article.description}</p><ArrowUpRight aria-hidden="true" />
+      </Link>)}</div>
+    </section>}
     <section className="xon-doctor-booking"><div><h2>{t.primaryAction}</h2><p>{t.formText}</p></div><LeadForm locale={locale} labels={content[locale]} defaultService={title} /></section>
   </XonInterior>
 }

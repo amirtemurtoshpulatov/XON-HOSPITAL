@@ -40,10 +40,10 @@ const ru: Content = {
   heroEyebrow: 'XON HOSPITAL · Ташкент',
   heroTitle: 'Многопрофильная клиника',
   heroAccent: 'в Ташкенте.',
-  heroText: '20 врачей, основные медицинские направления, комплексный Check-up, стационар и реабилитация — с понятным маршрутом и прозрачной стоимостью.',
+  heroText: 'Консультации врачей, диагностика, стационар и реабилитация — с понятным маршрутом пациента.',
   primaryAction: 'Записаться на приём',
   secondaryAction: 'Выбрать направление',
-  trust: ['20 врачей в одной команде', 'Комплексный Check-up', 'Реабилитация и стационар'],
+  trust: ['Врачи разных специальностей', 'УЗИ и лабораторная диагностика', 'Реабилитация и стационар'],
   servicesLabel: 'Направления',
   servicesTitle: 'Не отдельные процедуры. Целый маршрут к здоровью.',
   servicesText: 'Команда XON HOSPITAL рассматривает состояние комплексно и помогает пройти следующий шаг без лишней неопределённости.',
@@ -78,7 +78,7 @@ type LocalizedSections = Pick<Content, 'trust' | 'servicesText' | 'doctorsText' 
 
 const sections: Record<Exclude<SiteLocale, 'ru'>, LocalizedSections> = {
   uz: {
-    trust: ["Turli yo‘nalish shifokorlari","Kompleks Check-up","Reabilitatsiya va statsionar"],
+    trust: ["Turli yo‘nalish shifokorlari","UTT va laboratoriya diagnostikasi","Reabilitatsiya va statsionar"],
     servicesText: "Shifokorlar jamoasi holatingizni baholaydi va keyingi qadamlarni tushuntiradi.",
     doctorsText: "Mutaxassislarning yo‘nalishi va tajribasi bilan tanishing hamda qabulga yoziling.",
     affordabilityText: "Qabuldan oldin narx va xizmat tarkibini administrator bilan aniqlashtirishingiz mumkin.",
@@ -86,7 +86,7 @@ const sections: Record<Exclude<SiteLocale, 'ru'>, LocalizedSections> = {
     pathSteps: [["Suhbat","Shikoyatlaringiz va tibbiy tarixingizni tinglaymiz."],["Tekshiruv","Kerakli tahlil va tekshiruvlarni tanlaymiz."],["Reja","Keyingi qadamlarni tushuntiramiz."],["Kuzatuv","Holatingizga qarab rejani yangilaymiz."]].map(([title, text]) => ({ title, text })),
   },
   en: {
-    trust: ["Doctors across specialties","Personalised check-ups","Rehabilitation and inpatient care"],
+    trust: ["Doctors across specialties","Ultrasound and laboratory tests","Rehabilitation and inpatient care"],
     servicesText: "Our team assesses your concerns and helps you plan the next step.",
     doctorsText: "Explore our doctors’ specialties and experience and book a consultation.",
     affordabilityText: "Ask our coordinator what your visit includes and how much it costs before booking.",

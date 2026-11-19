@@ -4,6 +4,7 @@ import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 import { interiorCopy } from '@/components/XonInterior/copy'
 import { xonCopy } from '@/lib/xonCopy'
 import { getServerSideURL } from '@/utilities/getURL'
+import { xonLogo } from '@/lib/xonBrand'
 
 export function siteOrigin() {
   const configured = process.env.SITE_CANONICAL_URL
@@ -27,23 +28,23 @@ type StaticSection = (typeof staticSections)[number]
 const homeSearchCopy = {
   ru: {
     title: 'XON Hospital — многопрофильная клиника в Ташкенте',
-    description: 'Консультации врачей, УЗИ, комплексный чекап и реабилитация в XON Hospital в Ташкенте. Выберите специалиста и оставьте заявку на приём.',
+    description: 'XON Hospital в Ташкенте: консультации врачей, УЗИ и реабилитация. Клиника работает 24/7; ночью доступны дежурные терапевт и ЛОР. Запись онлайн.',
   },
   uz: {
     title: 'XON Hospital — Toshkentdagi ko‘p tarmoqli klinika',
-    description: 'Toshkentdagi XON Hospital klinikasida shifokor maslahati, UZI, kompleks tibbiy tekshiruv va reabilitatsiya. Mutaxassisni tanlang va qabulga yoziling.',
+    description: 'Toshkentdagi XON Hospital: shifokor maslahati, UTT va reabilitatsiya. Klinika 24/7 ishlaydi; tunda navbatchi terapevt va LOR mavjud. Onlayn yozilish.',
   },
   en: {
     title: 'XON Hospital — Multispecialty clinic in Tashkent',
-    description: 'Find a doctor at XON Hospital in Tashkent for consultations, ultrasound, health checkups and rehabilitation. Request an appointment online.',
+    description: 'XON Hospital in Tashkent: consultations, ultrasound and rehabilitation. Open 24/7, with an on-duty internist and ENT doctor at night. Book online.',
   },
   kk: {
     title: 'XON Hospital — Ташкенттегі көпсалалы клиника',
-    description: 'Ташкенттегі XON Hospital клиникасында дәрігер кеңесі, УДЗ, кешенді тексеру және оңалту. Маман таңдап, қабылдауға жазылыңыз.',
+    description: 'Ташкенттегі XON Hospital: дәрігер кеңесі, УДЗ және оңалту. Клиника тәулік бойы ашық; түнде кезекші терапевт пен ЛОР қабылдайды. Онлайн жазылу.',
   },
   tg: {
     title: 'XON Hospital — клиникаи бисёрсоҳа дар Тошканд',
-    description: 'Дар клиникаи XON Hospital дар Тошканд машварати табибон, УЗИ, муоинаи ҳамаҷониба ва барқарорсозӣ дастрас аст. Барои қабул дархост фиристед.',
+    description: 'XON Hospital дар Тошканд: машварати табиб, УЗИ ва барқарорсозӣ. Кушода 24/7; шабона терапевт ва ЛОР-и навбатдор қабул мекунанд. Дархост онлайн.',
   },
 } satisfies Record<SiteLocale, { title: string; description: string }>
 
@@ -65,7 +66,7 @@ type SEOInput = {
 export function pageSEO(locale: SiteLocale, path: string, data: SEOInput): Metadata {
   const canonical = new URL(`/${locale}${path}`, siteOrigin()).href
   const description = data.description || undefined
-  const image = data.image || '/xon-hospital-logo.jpeg'
+  const image = data.image || xonLogo.src
   return {
     title: data.title,
     description,
