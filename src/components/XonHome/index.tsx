@@ -106,6 +106,7 @@ export async function XonHome({ locale = 'ru' }: { locale?: SiteLocale }) {
           '@id': `${origin}/ru#clinic`, url: `${origin}/ru`, telephone: phone.replace(/[^\d+]/g, ''),
           address: { '@type': 'PostalAddress', streetAddress: settings.address || undefined, addressLocality: 'Tashkent', addressCountry: 'UZ' },
           sameAs: [clinicSocial.instagram, clinicSocial.youtube],
+          hasMap: clinicSocial.maps,
           image: `${origin}${xonLogo.src}`, logo: `${origin}${xonLogo.src}`,
         },
       ],

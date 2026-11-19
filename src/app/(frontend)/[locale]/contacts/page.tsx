@@ -7,6 +7,8 @@ import { interiorCopy } from '@/components/XonInterior/copy'
 import { LeadForm } from '@/components/XonHome/LeadForm'
 import { xonCopy, clinicSocial } from '@/lib/xonCopy'
 import { content, localeCodes, type SiteLocale } from '@/components/XonHome/content'
+import { XonVideoSection } from '@/components/XonVideo'
+import { clinicLocationVideo } from '@/lib/xonVideo'
 
 import { sectionMetadata } from '@/lib/xonSeo'
 
@@ -29,11 +31,12 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
     <section className="xon-page-content xon-contacts-grid" id="appointment">
       <div className="xon-contact-lines">
         <div className="xon-contact-line"><small>{ui.phone}</small><a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a></div>
-        <div className="xon-contact-line"><small>{ui.address}</small><strong>{settings.address || ui.city}</strong></div>
+        <div className="xon-contact-line"><small>{ui.address}</small><strong>{settings.address || ui.city}</strong><a href={clinicSocial.maps} target="_blank" rel="noreferrer">{ui.directions} · Яндекс Карты ↗</a></div>
         {settings.workingHours && <div className="xon-contact-line"><small>{ui.hours}</small><strong>{settings.workingHours}</strong></div>}
         <div className="xon-social-links"><a href={clinicSocial.instagram} target="_blank" rel="noreferrer">Instagram ↗</a><a href={clinicSocial.youtube} target="_blank" rel="noreferrer">YouTube ↗</a></div>
       </div>
       <div className="xon-contact-form-wrap"><h2>{labels.formTitle}</h2><LeadForm locale={locale} labels={labels} /></div>
     </section>
+    <XonVideoSection locale={locale} items={[{ title: ui.directions, url: clinicLocationVideo }]} />
   </XonInterior>
 }

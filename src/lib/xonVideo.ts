@@ -25,6 +25,16 @@ export function officialDoctorVideo(slug: string) {
   return typeof id === 'string' ? `https://www.youtube.com/shorts/${id}` : undefined
 }
 
+export function officialDoctorReels(slug: string) {
+  const primary = officialDoctorReel(slug)
+  return [
+    ...(primary ? [primary] : []),
+    ...(slug === 'xursand-yusupboyevich' ? ['https://www.instagram.com/reel/Df4NZ7poib9/'] : []),
+  ]
+}
+
+export const clinicLocationVideo = 'https://www.instagram.com/reel/Dfy-vE_Ir3P/'
+
 export function videoEmbed(url: string) {
   try {
     const parsed = new URL(url)

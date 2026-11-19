@@ -11,7 +11,7 @@ import { content, localeCodes, type SiteLocale } from '@/components/XonHome/cont
 import { doctorLocales, findDoctor } from '@/lib/clinicContent'
 import { pageSEO } from '@/lib/xonSeo'
 import { xonCopy } from '@/lib/xonCopy'
-import { httpsLink, officialDoctorReel, officialDoctorVideo, videoEmbed } from '@/lib/xonVideo'
+import { httpsLink, officialDoctorReels, officialDoctorVideo, videoEmbed } from '@/lib/xonVideo'
 import { visitGuideSlug } from '@/lib/xonArticles'
 
 type Props = { params: Promise<{ locale: SiteLocale; slug: string }> }
@@ -38,11 +38,12 @@ export default async function DoctorDetailPage({ params }: Props) {
 
   const ui = xonCopy(locale)
   const t = content[locale]
-  const reel = officialDoctorReel(slug)
-  const primaryVideo = (doctor.videoUrl && videoEmbed(doctor.videoUrl) ? doctor.videoUrl : null) || officialDoctorVideo(slug) || reel
+  const reels = officialDoctorReels(slug)
+  const primaryVideo = (doctor.videoUrl && videoEmbed(doctor.videoUrl) ? doctor.videoUrl : null) || officialDoctorVideo(slug)
   const videos: XonVideoItem[] = [
     ...(doctor.videoLibrary || []),
-    ...(primaryVideo ? [{ title: doctor.videoTitle || ui.videoTitle, url: primaryVideo, relatedReel: reel !== primaryVideo ? reel : undefined }] : []),
+    ...reels.map((url) => ({ title: doctor.videoTitle || ui.videoTitle, url })),
+    ...(primaryVideo ? [{ title: doctor.videoTitle || ui.videoTitle, url: primaryVideo }] : []),
     ...(doctor.videos || []),
   ]
   const handle = doctor.instagram?.replace(/^@/, '')

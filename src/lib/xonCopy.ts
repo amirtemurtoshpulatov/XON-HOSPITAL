@@ -10,6 +10,7 @@ export const clinicSocial = {
   youtube: 'https://www.youtube.com/@XONHOSPITAL',
   telegram: 'https://t.me/xon_hospital',
   phone: '+998 95 866 19 19',
+  maps: 'https://yandex.uz/maps/org/xon_hospital/63935219230/',
 }
 
 const labels = {
@@ -30,6 +31,7 @@ const labels = {
   servicesCount: ['медицинских направлений', 'tibbiy yo‘nalish', 'clinical specialties and services', 'медициналық бағыт', 'самти тиббӣ'],
   phone: ['Телефон', 'Telefon', 'Phone', 'Телефон', 'Телефон'],
   address: ['Адрес', 'Manzil', 'Address', 'Мекенжай', 'Суроға'],
+  directions: ['Как добраться', 'Qanday borish mumkin', 'Get directions', 'Қалай жетуге болады', 'Чӣ гуна рафтан мумкин аст'],
   hours: ['Часы работы', 'Ish vaqti', 'Opening hours', 'Жұмыс уақыты', 'Соатҳои корӣ'],
   priceOnRequest: ['По запросу', 'So‘rov bo‘yicha', 'On request', 'Сұраныс бойынша', 'Бо дархост'],
   info: ['О направлении', 'Yo‘nalish haqida', 'About this service', 'Бағыт туралы', 'Дар бораи самт'],

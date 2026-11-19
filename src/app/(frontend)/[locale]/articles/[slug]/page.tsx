@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { XonInterior } from '@/components/XonInterior'
 import { ClinicBreadcrumbs } from '@/components/ClinicBreadcrumbs'
 import { JsonLd } from '@/components/JsonLd'
-import RichText from '@/components/RichText'
+import { XonArticleBody } from '@/components/XonArticleBody'
 import { localeCodes, type SiteLocale } from '@/components/XonHome/content'
 import { articleLocales, findArticle } from '@/lib/clinicContent'
 import { articleCopy } from '@/lib/xonArticles'
@@ -71,9 +71,7 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       )}
       {image?.url && <Image className="xon-article-cover" src={image.url} alt={image.alt || article.title} width={image.width || 1000} height={image.height || 560} sizes="(max-width: 760px) 92vw, 760px" unoptimized />}
-      <div className="xon-article-body">
-        {entry ? <RichText data={entry.content} enableGutter={false} enableProse={false} /> : baseline?.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-      </div>
+      {entry ? <XonArticleBody content={entry.content} locale={locale} /> : <div className="xon-article-body">{baseline?.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>}
       {sources.length > 0 && <section className="xon-article-sources">
         <h2>{ui.sources}</h2>
         <ul>{sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a></li>)}</ul>

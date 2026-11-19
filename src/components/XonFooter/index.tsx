@@ -65,6 +65,7 @@ export function XonFooter({ locale, settings }: { locale: SiteLocale; settings: 
         <div className="xon-footer-column xon-footer-contacts">
           <h2>{t.contacts}</h2>
           <p>{settings.address || ui.city}</p>
+          <a href={clinicSocial.maps} target="_blank" rel="noreferrer">{ui.directions} ↗</a>
           <a className="xon-footer-phone" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
           {settings.workingHours && <p>{settings.workingHours}</p>}
           <div className="xon-footer-socials">

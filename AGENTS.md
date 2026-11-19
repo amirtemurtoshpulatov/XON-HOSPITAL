@@ -1,3 +1,5 @@
+For ongoing XON Hospital work, read `docs/PROJECT_STATE.md` first. It is the concise project handoff; update verified results and remaining work there instead of relying on the entire chat history. Never put credentials or personal patient information in it.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

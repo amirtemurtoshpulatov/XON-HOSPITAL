@@ -33,6 +33,10 @@
 .xon-article-body ul, .xon-article-body ol, .xon-article-sources ul { margin: 12px 0 24px; padding-inline-start: 1.3em; line-height: 1.65; }
 .xon-article-byline { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 24px; font-size: 14px; }
 .xon-article-cover { width: 100%; max-width: 760px; height: auto; margin-top: 28px; border-radius: 8px; }
+.xon-article-outline { max-width: 760px; margin-top: 36px; padding: clamp(20px, 4vw, 32px); background: #fff; border: 1px solid var(--xon-line); }
+.xon-article-outline h2 { margin-bottom: 16px; color: var(--xon-green); font-size: 24px; }
+.xon-article-outline ol { display: grid; gap: 10px; padding-inline-start: 1.3em; line-height: 1.5; }
+.xon-article-body > section { scroll-margin-top: 110px; }
 .xon-section-title:has(> h2:only-child) { display: block; }
 .xon-page-title h1 { overflow-wrap: anywhere; }
 .xon-page-cta .xon-page-cta-button { min-height: 52px; max-width: 100%; justify-content: space-between; border-radius: 5px; flex: 0 0 auto; }
