@@ -1,6 +1,6 @@
 # XON Hospital — concise handoff
 
-Updated: 2026-11-19. Read this and AGENTS.md before continuing. Verify live state before new claims.
+Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live state before new claims.
 
 ## Project and authority
 
@@ -9,7 +9,7 @@ Updated: 2026-11-19. Read this and AGENTS.md before continuing. Verify live stat
 - Fornex VPS162.248.165.149, Ubuntu24.04, 1CPU /2GB RAM /20GB disk +2GB swap. Checkout `/opt/xon-hospital`.
 - Locales: ru, uz, en, kk, tg. Publish translated URLs only when actual content exists.
 - User authorizes improvements, verification and deployment; preserve CMS edits, navy/gold brand and transparent logo. Avoid repeated permission questions.
-- **LATEST USER INSTRUCTION: do NOT add XON to Google Business Profile. Work on website SEO and indexing.** The draft UI was closed; do not resume profile creation or terms acceptance.
+- **Do NOT add XON to Google Business Profile. Latest active task: repair CRM list loading, clarify card dragging and staff role assignment.** The draft UI was closed; do not resume profile creation or terms acceptance.
 - Skills are installed independently of this chat. Discover them in a new chat. This file is project context, not model memory; do not copy every skill into the prompt.
 
 ## Owner-confirmed facts
@@ -45,7 +45,7 @@ Updated: 2026-11-19. Read this and AGENTS.md before continuing. Verify live stat
 ## Source, deployment and recovery
 
 - Local main pushes to **codex/vps-production**. Remote main diverges; do NOT force-push it. Production pulls `git pull --ff-only origin codex/vps-production`.
-- Web image currentlyf17724f. Tooling/source5431605 for CMS-only changes. Documentation commits do not require web rebuild.
+- Web/tooling source c1da8ae deployed on Nov20. It includes pending Nov19 repairs plus the CRM interaction/role guidance fixes. Production Docker build passed; old image retained as rollback-crm-20261120. Documentation-only commits do not require a web rebuild.
 - See docs/DEPLOYMENT.md. Never print .env.production, credentials or patient data.
 - Preserve previous web image rollback tag before builds. Existing rollback-1a7ef50 and rollback-before-local-seo tags retained. Keep old web serving during build. Do not prune volumes.
 - Build web with production Compose; tooling-only changes: `docker compose --env-file .env.production -f compose.production.yml build migrate`. Run CLI via `run --rm migrate pnpm exec tsx src/scripts/…`.
@@ -59,8 +59,23 @@ Updated: 2026-11-19. Read this and AGENTS.md before continuing. Verify live stat
 - Reusable public HTTP audit: `python3 scripts/audit-live-seo.py --output /tmp/xon-seo.json`. It measures HTML checks, NOT Google index counts, ranking or field Core Web Vitals.
 - docs/SEO_PLAN.md records competitor findings, priorities and limits. User's screenshots establish XON is already searchable; Horev's business panel/sitelinks cannot be forced with schema.
 - Useful next content groups: hair loss/eczema after dermatology, heartburn after gastroenterology, headache after neurology. Research each from clinical sources, write original explanations, seek real clinician review. No mass lightly rewritten competitor articles.
-- Add licence/approved prices/reviewer details only when supplied; analytics only after owner provides property/ID. No paid ads or budget approved.
+- Add licence/approved prices/reviewer details only when supplied. No paid ads or budget approved. GA4 is now authorized/configured as described below.
 - Ranking and recrawl timing belong to Google. Do not promise#1, exact sitelinks, immediate favicon refresh, or index coverage of every sitemap URL.
+
+## CRM and Analytics — Nov20 repair
+
+- User-designated chief: amirtemurtoshpulatov@gmail.com. Existing account promoted to owner on Nov19. Roles: owner (all + staff + lead deletion), manager (leads/status/comments; no deletion), editor (site content; no leads). Users cannot escalate their own role; last owner protected from demotion/self-deletion.
+- Schema migration20261119_175235_crm_roles_comments applied successfully Nov19 after checked backup `/opt/xon-backups/before-crm-20261119.sql.gz`. Separate PostgreSQL clean-install/upgrade/repeat migration test passed. No new schema change for Nov20 repair.
+- Nov20 production had TWO leads, both new; data remained in PostgreSQL. UI list was broken by `/api/leads` public POST route shadowing Payload REST GET (405). Fixed forwarding GET/PATCH/DELETE/PUT/OPTIONS to Payload; authenticated owner/manager POST delegates to Payload while anonymous booking keeps its existing validation/rate limit. Never expose public lead reads.
+- CRM moved above Analytics; explicit drag handle, destination highlight, arrow-key and select alternatives; role-management links plus instructions. Busy controls prevent switching comment threads while saving; aborted comment fetches do not overwrite another thread. Load failure no longer claims there are zero leads.
+- Local browser verified list loading and persisted status change; role list/owner access visible. Vitest16 tests passed: dashboard workflows, drag/drop save, keyboard move, comment creation, fetch retry, owner staff creation/assignment, manager/editor access restrictions, deletion/history, consent/data boundaries. TypeScript and targeted ESLint passed.
+- Production repair verified Nov20 in the owner's signed-in Chrome: “Показано 2 из 2 заявок”, explicit drag handles and staff-management links visible, previous load error gone. Real leads were not modified for QA. Separate local browser verified persisted status change and visible role choices; test screenshot /private/tmp/xon-crm-fixed-20261120.jpg contains synthetic data only.
+- GA4 account417033880 / property565251087 / stream16376605318. Public measurement ID **G-TR49WKDCGR**. Reports: https://analytics.google.com/analytics/web/#/a417033880p565251087/reports/intelligenthome.
+- User explicitly authorized ONLY FREE GA4/Data API, free Cloud project xon-hospital-analytics, service account xon-analytics-reader@xon-hospital-analytics.iam.gserviceaccount.com with Viewer on this property only (no cost/revenue metrics), and private key only on VPS. User personally clicked Enable accepting API terms; API observed Enabled. No billing or paid services enabled.
+- Credential file `/opt/xon-hospital/credentials/ga-service-account.json`, UID1001/mode400, readonly mount `/app/credentials`; temporary downloaded copy removed. It is gitignored and Dockerignored. Never print/read out key contents, tokens or .env values.
+- Server env GA_MEASUREMENT_ID, GA_PROPERTY_ID, GA_SERVICE_ACCOUNT_FILE configured. Actual Data API returned state ready with real zero counts on Nov19; dashboard API worked. GA browser collection/end-to-end realtime visit still needs verification after documented gtag queue-format fix is deployed. Do not claim traffic recorded until observed.
+- GA tags only frontend, only after analytics consent; no admin/form data, queries/fragments, personal identifiers or ad personalization. Aggregate dashboard cache5min; metrics7/28/90days and realtime30min.
+- Local QA DB `/private/tmp/xon-crm-qa-20261119.db` contains ONLY synthetic fixtures. Stop the local dev server after QA. Do not store test passwords here.
 
 ## New-chat starter
 

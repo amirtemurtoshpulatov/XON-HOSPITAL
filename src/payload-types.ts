@@ -439,11 +439,16 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * Назначать роли и создавать сотрудников может только главный администратор. Выберите сотрудника, измените «Уровень доступа» и сохраните карточку.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  /**
+   * Менеджер: заявки без удаления. Редактор: контент без заявок. Главный администратор: полный доступ.
+   */
   role: 'owner' | 'manager' | 'editor';
   name?: string | null;
   updatedAt: string;
