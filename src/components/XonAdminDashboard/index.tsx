@@ -48,7 +48,9 @@ export function XonAdminDashboard() {
   const crmAccess = role === 'owner' || role === 'manager'
   const [leads, setLeads] = useState<Lead[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
+  const [total, setTotal] = useState<number | null>(null)
+  const [dragging, setDragging] = useState<Lead['id'] | null>(null)
+  const [dropTarget, setDropTarget] = useState<string | null>(null)
   const [more, setMore] = useState(false)
   const [search, setSearch] = useState('')
   const [busy, setBusy] = useState(false)
@@ -63,6 +65,7 @@ export function XonAdminDashboard() {
     setError(''); setLoading(true)
     try {
       const result = await jsonRequest(`/api/leads?depth=0&limit=50&sort=-createdAt&page=${next}`)
+      if (!Array.isArray(result.docs)) throw new Error('invalid_lead_list')
       setLeads((previous) => next === 1 ? result.docs : [...previous, ...result.docs])
       setTotal(result.totalDocs); setMore(result.hasNextPage); setPage(next)
     } catch { setError('Не удалось загрузить заявки. Проверьте вход и обновите страницу.') }
@@ -75,7 +78,7 @@ export function XonAdminDashboard() {
     if (!selectedID) return
     const abort = new AbortController()
     setCommentsLoading(true)
-    jsonRequest(`/api/lead-comments?depth=0&limit=100&sort=-createdAt&where[lead][equals]=${selectedID}`, { signal: abort.signal }).then((result) => setComments(result.docs)).catch(() => { if (!abort.signal.aborted) setError('Не удалось загрузить комментарии.') }).finally(() => { if (!abort.signal.aborted) setCommentsLoading(false) })
+    jsonRequest(`/api/lead-comments?depth=0&limit=100&sort=-createdAt&where[lead][equals]=${selectedID}`, { signal: abort.signal }).then((result) => { if (!abort.signal.aborted) setComments(result.docs) }).catch(() => { if (!abort.signal.aborted) setError('Не удалось загрузить комментарии.') }).finally(() => { if (!abort.signal.aborted) setCommentsLoading(false) })
     return () => abort.abort()
   }, [selectedID])
 
@@ -84,6 +87,7 @@ export function XonAdminDashboard() {
     setBusy(true); setError('')
     try {
       const result = await jsonRequest(`/api/leads/${id}?depth=0`, { method: 'PATCH', body: JSON.stringify({ status }) })
+      if (!result.doc?.id) throw new Error('invalid_lead_update')
       setLeads((items) => items.map((item) => item.id === id ? result.doc : item))
       if (selected?.id === id) setSelected(result.doc)
     } catch { setError('Статус не сохранён. Обновите данные и повторите.') }
@@ -104,46 +108,52 @@ export function XonAdminDashboard() {
     setBusy(true); setError('')
     try {
       await jsonRequest(`/api/leads/${lead.id}`, { method: 'DELETE' })
-      setLeads((items) => items.filter((item) => item.id !== lead.id)); setSelected(null); setTotal((value) => value - 1)
+      setLeads((items) => items.filter((item) => item.id !== lead.id)); setSelected(null); setTotal((value) => value === null ? null : value - 1)
     } catch { setError('Не удалось удалить заявку.') }
     finally { setBusy(false) }
   }
   if (!role) return null
   const filtered = leads.filter((lead) => `${lead.name} ${lead.phone} ${lead.serviceInterest || ''}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
   return <div className="xon-admin-dashboard">
-    <TrafficPanel />
     {crmAccess && <section className="xon-dash-panel">
-      <header><div><h2>Заявки · CRM</h2><p>Перетащите карточку или выберите статус в списке. Показано {leads.length} из {total} заявок.</p></div><div className="xon-dash-actions"><button onClick={() => void load()} disabled={loading || busy}>Обновить</button><Link href="/admin/collections/leads/create">Новая заявка</Link><Link href="/admin/collections/leads">Таблица и фильтры</Link>{role === 'owner' && <Link href="/admin/collections/users">Сотрудники и доступы</Link>}</div></header>
+      <header><div><h2>Заявки · CRM</h2><p>{total === null ? 'Список заявок ещё не загружен.' : `Показано ${leads.length} из ${total} заявок.`}</p></div><div className="xon-dash-actions"><button onClick={() => void load()} disabled={loading || busy}>Обновить</button><Link href="/admin/collections/leads/create">Новая заявка</Link><Link href="/admin/collections/leads">Таблица и фильтры</Link>{role === 'owner' && <><Link href="/admin/collections/users">Сотрудники и роли</Link><Link href="/admin/collections/users/create">Добавить сотрудника</Link></>}</div></header>
+      <div className="xon-crm-guide" id="xon-crm-help"><strong>Как менять статус</strong><p>Зажмите «⠿ Перетащить» вверху карточки и перенесите её в нужную колонку. Можно также выбрать «Статус» в карточке — этот способ работает и на телефоне.</p></div>
+      {role === 'owner' && <details className="xon-crm-role-guide"><summary>Как назначать доступ сотрудникам</summary><p>Откройте «Сотрудники и роли», выберите человека или нажмите «Добавить сотрудника». В поле «Уровень доступа» выберите роль и сохраните карточку.</p><ul><li><strong>Главный администратор:</strong> все разделы, сотрудники и удаление заявок.</li><li><strong>Менеджер CRM:</strong> заявки, статусы и комментарии, без удаления.</li><li><strong>Редактор сайта:</strong> врачи, услуги и статьи, без доступа к заявкам.</li></ul></details>}
       <label className="xon-dash-search">Поиск среди загруженных заявок<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Имя, телефон или направление" /></label>
       {error && <p className="xon-dash-error" role="alert">{error}</p>}
       {loading && <p role="status">Загружаю заявки…</p>}
-      <div className="xon-crm-board" aria-busy={busy}>
-        {stages.map(([status, label]) => <section className={`xon-crm-column xon-crm-column--${status}`} key={status} aria-label={label} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
-          event.preventDefault(); const id = event.dataTransfer.getData('text/plain'); const lead = leads.find((item) => String(item.id) === id)
+      {(!error || leads.length > 0) && <div className="xon-crm-board" aria-busy={busy}>
+        {stages.map(([status, label]) => <section className={`xon-crm-column xon-crm-column--${status}${dropTarget === status ? ' xon-crm-column--target' : ''}`} key={status} aria-label={label} onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move'; if (dragging !== null) setDropTarget(status) }} onDrop={(event) => {
+          event.preventDefault(); const id = event.dataTransfer.getData('text/plain') || String(dragging); const lead = leads.find((item) => String(item.id) === id); setDragging(null); setDropTarget(null)
           if (lead && lead.status !== status) void move(lead.id, status)
         }}><h3>{label}<span>{filtered.filter((lead) => lead.status === status).length}</span></h3>
-          {filtered.filter((lead) => lead.status === status).map((lead) => <article className="xon-crm-card" key={lead.id} draggable={!busy} onDragStart={(event) => event.dataTransfer.setData('text/plain', String(lead.id))}>
-            <span className="xon-crm-handle" aria-hidden="true">⠿ Перетащить</span>
-            <button className="xon-crm-name" onClick={() => { setSelected(lead); setComments([]); setComment(''); setError('') }}>{lead.name}</button>
+          {filtered.filter((lead) => lead.status === status).map((lead) => <article className={`xon-crm-card${dragging === lead.id ? ' xon-crm-card--dragging' : ''}`} key={lead.id}>
+            <button type="button" className="xon-crm-handle" draggable={!busy} disabled={busy} aria-describedby="xon-crm-help" title="Зажмите и перенесите в другую колонку. Клавиши ← и → также меняют статус." onDragStart={(event) => { event.dataTransfer.setData('text/plain', String(lead.id)); event.dataTransfer.effectAllowed = 'move'; setDragging(lead.id) }} onDragEnd={() => { setDragging(null); setDropTarget(null) }} onKeyDown={(event) => {
+              if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+              event.preventDefault(); const index = stages.findIndex(([value]) => value === lead.status) + (event.key === 'ArrowRight' ? 1 : -1)
+              if (stages[index]) void move(lead.id, stages[index][0])
+            }}>⠿ Перетащить</button>
+            <button className="xon-crm-name" disabled={busy} onClick={() => { setSelected(lead); setComments([]); setComment(''); setError('') }}>{lead.name}</button>
             <a href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`}>{lead.phone}</a>
             {lead.serviceInterest && <p>{lead.serviceInterest}</p>}<small>{stamp(lead.createdAt)} · {lead.locale?.toUpperCase()}</small>
             <label>Статус<select value={lead.status} disabled={busy} onChange={(event) => void move(lead.id, event.target.value as Lead['status'])}>{stages.map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></label>
-            <button onClick={() => { setSelected(lead); setComments([]); setComment(''); setError('') }}>Комментарии и история</button>
+            <button disabled={busy} onClick={() => { setSelected(lead); setComments([]); setComment(''); setError('') }}>Комментарии и история</button>
           </article>)}
-          {!filtered.some((lead) => lead.status === status) && <p className="xon-dash-muted">Заявок нет</p>}
+          {!loading && total !== null && !filtered.some((lead) => lead.status === status) && <p className="xon-dash-muted">Заявок нет</p>}
         </section>)}
-      </div>
-      {more && <button disabled={loading} onClick={() => void load(page + 1)}>Загрузить ещё 50</button>}
-      {selected && <section ref={threadRef} className="xon-crm-thread" aria-label={`Заявка: ${selected.name}`}><header><h3>{selected.name}</h3><button onClick={() => setSelected(null)}>Закрыть</button></header>
+      </div>}
+      {more && <button disabled={loading || busy} onClick={() => void load(page + 1)}>Загрузить ещё 50</button>}
+      {selected && <section ref={threadRef} className="xon-crm-thread" aria-label={`Заявка: ${selected.name}`}><header><h3>{selected.name}</h3><button disabled={busy} onClick={() => setSelected(null)}>Закрыть</button></header>
         <p><a href={`tel:${selected.phone.replace(/[^+\d]/g, '')}`}>{selected.phone}</a> · {statusName(selected.status)}</p>
         {selected.comment && <p><strong>Комментарий из заявки:</strong> {selected.comment}</p>}
         <div className="xon-dash-actions"><Link href={`/admin/collections/leads/${selected.id}`}>Открыть карточку заявки</Link>{role === 'owner' && <button className="xon-dash-delete" disabled={busy} onClick={() => void remove(selected)}>Удалить заявку</button>}</div>
         <h4>Комментарии сотрудников</h4>{commentsLoading && <p role="status">Загружаю комментарии…</p>}
         {!commentsLoading && comments.length === 0 && <p>Комментариев пока нет.</p>}
         {comments.map((note) => <article className="xon-crm-comment" key={note.id}><small>{note.authorName} · {stamp(note.createdAt)}</small><p>{note.text}</p></article>)}
-        <form onSubmit={addComment}><label>Новый комментарий<textarea maxLength={3000} required rows={3} value={comment} onChange={(event) => setComment(event.target.value)} /></label><button disabled={busy || !comment.trim()} type="submit">Добавить комментарий</button></form>
+        <form onSubmit={addComment}><label>Новый комментарий<textarea disabled={busy} maxLength={3000} required rows={3} value={comment} onChange={(event) => setComment(event.target.value)} /></label><button disabled={busy || !comment.trim()} type="submit">Добавить комментарий</button></form>
         <details><summary>История статусов</summary><ol>{[...(selected.statusHistory || [])].reverse().map((item, index) => <li key={item.id || index}>{item.at ? stamp(item.at) : ''} · {item.authorName} · {item.from ? `${statusName(item.from)} → ` : ''}{statusName(item.to || '')}</li>)}</ol></details>
       </section>}
     </section>}
+    <TrafficPanel />
   </div>
 }

@@ -1,16 +1,23 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { REST_GET, REST_POST } from '@payloadcms/next/routes'
+import { REST_DELETE, REST_GET, REST_OPTIONS, REST_PATCH, REST_POST, REST_PUT } from '@payloadcms/next/routes'
 import type { NextRequest } from 'next/server'
 import { roleOf } from '@/access/roles'
 
 const attempts = new Map<string, { count: number; resetAt: number }>()
+
+export const dynamic = 'force-dynamic'
 
 const collectionContext = () => ({ params: Promise.resolve({ slug: ['leads'] }) })
 // Keep the public booking endpoint compatible with the CMS collection API.
 export async function GET(request: NextRequest) {
   return REST_GET(configPromise)(request, collectionContext())
 }
+export const DELETE = (request: NextRequest) => REST_DELETE(configPromise)(request, collectionContext())
+export const PATCH = (request: NextRequest) => REST_PATCH(configPromise)(request, collectionContext())
+export const PUT = (request: NextRequest) => REST_PUT(configPromise)(request, collectionContext())
+export const OPTIONS = (request: NextRequest) => REST_OPTIONS(configPromise)(request, collectionContext())
+
 export async function POST(request: Request) {
   if (request.headers.get('cookie')?.includes('payload-token=') || request.headers.has('authorization')) {
     const payload = await getPayload({ config: configPromise })

@@ -49,6 +49,12 @@ describe('CRM role enforcement and audit history', () => {
     await expect(payload.update({ collection: 'lead-comments', id: note.id, data: { text: 'rewritten' }, user: manager, overrideAccess: false })).rejects.toThrow()
     await expect(payload.delete({ collection: 'lead-comments', id: note.id, user: manager, overrideAccess: false })).rejects.toThrow()
   })
+  it('lets the owner create staff and assign a role', async () => {
+    const staff = await payload.create({ collection: 'users', data: { email: 'staff@example.invalid', password: 'test-password-only', role: 'editor', name: 'Synthetic staff' }, user: owner, overrideAccess: false })
+    expect(staff.role).toBe('editor')
+    const changed = await payload.update({ collection: 'users', id: staff.id, data: { role: 'manager' }, user: owner, overrideAccess: false })
+    expect(changed.role).toBe('manager')
+  })
   it('protects the last owner from demotion or self-deletion', async () => {
     await expect(payload.update({ collection: 'users', id: owner.id, data: { role: 'manager' }, user: owner, overrideAccess: false })).rejects.toThrow()
     await expect(payload.delete({ collection: 'users', id: owner.id, user: owner, overrideAccess: false })).rejects.toThrow()
