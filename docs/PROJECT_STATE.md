@@ -9,7 +9,7 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Fornex VPS162.248.165.149, Ubuntu24.04, 1CPU /2GB RAM /20GB disk +2GB swap. Checkout `/opt/xon-hospital`.
 - Locales: ru, uz, en, kk, tg. Publish translated URLs only when actual content exists.
 - User authorizes improvements, verification and deployment; preserve CMS edits, navy/gold brand and transparent logo. Avoid repeated permission questions.
-- **Do NOT add XON to Google Business Profile. Latest active task: repair CRM list loading, clarify card dragging and staff role assignment.** The draft UI was closed; do not resume profile creation or terms acceptance.
+- **Do NOT add XON to Google Business Profile. Latest task: diagnose missing non-brand search visibility; CRM repair is complete.** The draft UI was closed; do not resume profile creation or terms acceptance.
 - Skills are installed independently of this chat. Discover them in a new chat. This file is project context, not model memory; do not copy every skill into the prompt.
 
 ## Owner-confirmed facts
@@ -61,6 +61,15 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Useful next content groups: hair loss/eczema after dermatology, heartburn after gastroenterology, headache after neurology. Research each from clinical sources, write original explanations, seek real clinician review. No mass lightly rewritten competitor articles.
 - Add licence/approved prices/reviewer details only when supplied. No paid ads or budget approved. GA4 is now authorized/configured as described below.
 - Ranking and recrawl timing belong to Google. Do not promise#1, exact sitelinks, immediate favicon refresh, or index coverage of every sitemap URL.
+
+## Search visibility diagnosis — Nov20
+
+- Fresh signed-in Search Console URL Inspection confirms `/ru`, `/ru/services/oncology` and `/ru/services/inpatient`: **URL is on Google / Page is indexed**. No repeat indexing requests submitted for these indexed pages.
+- Performance **24 hours** (Nov19–20; UI last update3.5h ago):8 impressions,2 clicks. Visible query `xon hospital`:6 impressions,2 clicks. Remaining query detail not shown; do not infer all impressions are branded or invent positions for generic terms. Aggregate average position3.1 does NOT establish ranking for the user's generic queries.
+- Default3-month report initially showed zero and a chart endingNov17, before launch; switching to24h revealed recent data. Pages aggregate report still processing; total indexed URL count remains unknown.
+- Repeated public HTTP audit:182 unique sitemap URLs,0 checked HTML issues; report `/private/tmp/xon-seo-20261120.json`. This is crawlability, not182 indexed URLs.
+- Actual inpatient page content is sparse: a one-sentence description repeated, appointment form, navigation/footer; no substantive admission/stay details. Oncology has reasons, procedures, two doctors and FAQ. Prioritize accurate inpatient information and deeper service-specific content, rather than claiming an indexing outage. Obtain real admission scope, room information, approved prices and responsible doctors before publishing such clinic-specific claims.
+- Evidence screenshots `/private/tmp/xon-search-performance-20261120.png`, `/private/tmp/xon-oncology-indexed-20261120.png`, `/private/tmp/xon-inpatient-indexed-20261120.png`. Search Console data is provisional and time-bound; do not promise exact ranking dates.
 
 ## CRM and Analytics — Nov20 repair
 

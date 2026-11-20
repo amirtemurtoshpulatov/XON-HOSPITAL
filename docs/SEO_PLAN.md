@@ -75,6 +75,8 @@ Production verification on2026-11-19:
 
 ## Practical next priorities
 
+Nov20 diagnostic update: Google URL Inspection confirms Russian home, oncology and inpatient pages are indexed. The24h Performance report shows8 impressions/2 clicks, including visible branded query `xon hospital` (6 impressions/2 clicks); no evidence of generic-query visibility yet. Default3-month report is lagging (chart endedNov17); Pages aggregate report still processing. Public audit of182 URLs again passed0 checked issues. Inpatient is a concrete content gap: its substantive text is only a short description, without admission/stay information. Obtain approved clinic facts and expand that page; indexed status alone is not competitive visibility. Do not interpret average position3.1 in this tiny sample as a generic-keyword ranking.
+
 - **Google Business Profile work cancelled by the user.** Do not create or edit a listing. The website/indexing work proceeds independently.
 - After Google populates Pages and Performance reports, evaluate actual excluded URLs, queries, clicks and languages; fix identified causes rather than repeatedly submitting every URL.
 - Content: next develop researched hair-loss, heartburn and headache guides tied to real specialties. Use clinical sources and original explanations. Have a clinician review before labelling a page as reviewed; preserve editorial CMS changes.
