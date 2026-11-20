@@ -9,7 +9,7 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Fornex VPS162.248.165.149, Ubuntu24.04, 1CPU /2GB RAM /20GB disk +2GB swap. Checkout `/opt/xon-hospital`.
 - Locales: ru, uz, en, kk, tg. Publish translated URLs only when actual content exists.
 - User authorizes improvements, verification and deployment; preserve CMS edits, navy/gold brand and transparent logo. Avoid repeated permission questions.
-- **Do NOT add XON to Google Business Profile. Latest task: diagnose missing non-brand search visibility; CRM repair is complete.** The draft UI was closed; do not resume profile creation or terms acceptance.
+- **Do NOT add XON to Google Business Profile. Latest task: inpatient content enrichment published on all5 locales; CRM repair is complete.** The draft UI was closed; do not resume profile creation or terms acceptance.
 - Skills are installed independently of this chat. Discover them in a new chat. This file is project context, not model memory; do not copy every skill into the prompt.
 
 ## Owner-confirmed facts
@@ -17,6 +17,7 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Address: Ташкент, 8-й проезд Файзли,14. Uzbek: Toshkent, Fayzli8-tor ko‘chasi,14.
 - Clinic24/7. Overnight ONLY on-duty therapist/internist and ENT. Other specialists:08:30 until approximately17:30–18:00, individual schedules. Do not advertise every named doctor overnight.
 - Phone +998958661919. Map https://yandex.uz/maps/org/xon_hospital/63935219230/.
+- Owner confirmed Nov20: inpatient treatment is **non-surgical**, planned inpatient courses **from10 days**. Do not imply any condition can be cured without surgery or promise discharge on day10. Room types, course inclusions and prices remain unconfirmed.
 - Check-up packages are **in development**. No approved contents/prices. Page is a noindex status page, excluded from active offers and sitemaps.
 - Never fabricate prices, reviews, qualifications, licence details, clinician review or ranking promises.
 
@@ -40,6 +41,7 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Localized service search titles with Tashkent; truthful Service and ProfilePage/Person structured data. Service→article→doctor links and night-care notices. Address/hours updated all5 CMS locales.
 - Dermatology, gastroenterology and ultrasound enriched in ru+uz:5 original sections per page, reasons and related doctor. Only empty service content filled; custom edits preserved. Repeat dry-run0 changes.
 - Prevention articles blood-pressure-at-home and movement-for-prevention expanded in ru+uz via5431605:7 sections, approximately300–350 words each, clinical sources and practical explanations. Publisher only appends to exact known starter content and skips drafts/custom edits. Other locale translations are preserved. Verify publication log/live pages before claiming completion if this handoff is interrupted during deployment.
+- Inpatient enriched Nov20 via a34d000: all5 locales now have6 substantive content sections,3 key facts,3 consultation reasons and5 FAQs. Non-surgical treatment and courses from10 days appear in summary/key facts and automatic SEO description. Booking, preparation, cost questions and nuanced night-care hours covered; no invented pricing, room features or assigned doctors. Editable under Services→inpatient in Payload. Script src/scripts/enrichInpatient.ts fills empty content, replaces only known starter summaries, preserves custom text/other fields; repeat production dry-run0 updates.
 - Article source movement-for-prevention now relates to therapy rather than unavailable check-up. DB relation was already corrected.
 
 ## Source, deployment and recovery
@@ -51,6 +53,7 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Build web with production Compose; tooling-only changes: `docker compose --env-file .env.production -f compose.production.yml build migrate`. Run CLI via `run --rm migrate pnpm exec tsx src/scripts/…`.
 - Root-only, integrity-checked pg_dump gzip backups in `/opt/xon-backups`: before-evidence, before-doctor-focus, before-local-seo, before-service-content, before-prevention-expansion (all20261119).
 - Disk80% at latest login; monitor before large rebuilds. No uncontrolled image/cache/volume cleanup.
+- Nov20 inpatient update: server checkout/tooling a34d000; web remains c1da8ae because this is CMS content only (force-dynamic public pages). Only migrate/tooling image rebuilt. Root-only checked backup /opt/xon-backups/before-inpatient-20261120.sql.gz. No schema change or web restart needed.
 - SSH sessions may expire. Credentials shared in earlier screenshots must never be stored in this document.
 
 ## Checks and realistic next work
@@ -68,8 +71,9 @@ Updated: 2026-11-20. Read this and AGENTS.md before continuing. Verify live stat
 - Performance **24 hours** (Nov19–20; UI last update3.5h ago):8 impressions,2 clicks. Visible query `xon hospital`:6 impressions,2 clicks. Remaining query detail not shown; do not infer all impressions are branded or invent positions for generic terms. Aggregate average position3.1 does NOT establish ranking for the user's generic queries.
 - Default3-month report initially showed zero and a chart endingNov17, before launch; switching to24h revealed recent data. Pages aggregate report still processing; total indexed URL count remains unknown.
 - Repeated public HTTP audit:182 unique sitemap URLs,0 checked HTML issues; report `/private/tmp/xon-seo-20261120.json`. This is crawlability, not182 indexed URLs.
-- Actual inpatient page content is sparse: a one-sentence description repeated, appointment form, navigation/footer; no substantive admission/stay details. Oncology has reasons, procedures, two doctors and FAQ. Prioritize accurate inpatient information and deeper service-specific content, rather than claiming an indexing outage. Obtain real admission scope, room information, approved prices and responsible doctors before publishing such clinic-specific claims.
+- Before Nov20 enrichment, inpatient had only a short repeated description. This content gap is now addressed as described above. Obtain actual room details, approved prices and responsible doctors before publishing further clinic-specific claims.
 - Evidence screenshots `/private/tmp/xon-search-performance-20261120.png`, `/private/tmp/xon-oncology-indexed-20261120.png`, `/private/tmp/xon-inpatient-indexed-20261120.png`. Search Console data is provisional and time-bound; do not promise exact ranking dates.
+- Inpatient QA: TypeScript/targeted ESLint passed; isolated SQLite publication and repeat dry-run0 passed; production PostgreSQL update5 locales/repeat0. All5 public URLs200, matching canonical/lang, oneH1, no noindex,6 rendered content headings/5FAQs/3facts and new meta descriptions; /private/tmp/xon-inpatient-live-20261120.json. Browser desktop1280/mobile390: no mobile overflow, readable text, FAQ duration answer opens, no JS error logs. Screenshot /private/tmp/xon-inpatient-mobile-20261120.png. General preparation checked against NHS hospital admission guidance; clinic-specific requirements still to be confirmed.
 
 ## CRM and Analytics — Nov20 repair
 
